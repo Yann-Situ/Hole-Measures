@@ -1,0 +1,4 @@
+build
+tools/build-*
+tools/gui/*.user
+data/*
