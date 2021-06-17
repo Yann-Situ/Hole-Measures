@@ -15,7 +15,7 @@ To execute this software, just do
 ```
 ./main_V filename.off
 ```
-For instance, `./main_V ../data/eight.off`
+For instance, `./main_voronoi ../data/eight.off`
 
 It will compute TB-balls pairs and store them in `filename_V.tb`.
 
