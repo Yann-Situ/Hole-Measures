@@ -13,7 +13,7 @@ To compile, create a `build` directory in the git initial folder and run `cmake 
 
 To execute this software, just do
 ```
-./main_V filename.off
+./main_voronoi filename.off
 ```
 For instance, `./main_voronoi ../data/eight.off`
 
