@@ -1,22 +1,22 @@
-#ifndef FILTRATION_V_H
-#define FILTRATION_V_H
+#ifndef FILTRATION_VORONOI_H
+#define FILTRATION_VORONOI_H
 
 
 #include "cgal_typedef.h"
 #include "filtration.h"
 /**
- * @brief The FiltrationV class
+ * @brief The FiltrationVoronoi class
  * Contains functions to create and handle the voronoi/delaunay filtration
  * of a mesh file .off.
  */
 
 enum class CellCritType {NonCritical, Critical};
 
-class FiltrationV : public Filtration<Delaunay::Simplex>
+class FiltrationVoronoi : public Filtration<Delaunay::Simplex>
 {
 public:
     typedef Delaunay::Simplex Simplex;
-    FiltrationV(Polyhedron poly);//const std::string &filename);
+    FiltrationVoronoi(Polyhedron poly);//const std::string &filename);
 
     void init_Dcell_filtration_values();
     void compute_infinite_voronoi_face_duals();
@@ -43,15 +43,15 @@ private:
     std::set<Simplex> infinite_voronoi_face_duals;   /// set of Delaunay face whose dual is infinite
     std::set<Simplex> boundary_delaunay_faces;   /// set of Delaunay faces whose dual links inside to outside
 
-    std::map<Delaunay::Cell_handle, double> m_cell_filtration;  /// map cell -> its filtration
-    std::deque<double> m_filtration;                           /// map: pos in filter -> filtration value
+    std::map<Delaunay::Cell_handle, double> m_cell_filtration;  /// map a Dcell to its filtration value
+    std::deque<double> m_filtration;                           /// map a position (in filter) to its filtration value
     std::deque<Simplex> m_filter;                    /// list of simplices in the filter
-    //std::deque<Delaunay::Point> m_point;                       /// map pos of simplex in filter -> cell -> circumcenter
-    std::deque<Delaunay::Cell_handle> m_cell;                       /// the cell of m_point
+    //std::deque<Delaunay::Point> m_point;                       /// map a position of a simplex in filter -> cell -> circumcenter
+    std::deque<Delaunay::Cell_handle> m_cell;                       /// map a position of a simplex in filter to its associated Dcell
 
-    std::map<Simplex, std::vector<int>> m_coboundary; /// map simplex -> the list of its Delaunay coboudary cell positions
+    std::map<Simplex, std::vector<int>> m_coboundary; /// map a simplex to the list of its Delaunay coboudary cell filter positions
     // SoT inside;
 };
 
 
-#endif // FILTRATION_V_H
+#endif // FILTRATION_VORONOI_H

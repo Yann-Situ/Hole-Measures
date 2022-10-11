@@ -4,7 +4,7 @@ computes the medial axes filtrations of a mesh.
 It is based on Aldo's code in something.cpp that compute the Delaunay filtration.
 */
 
-#include "filtration_medial_axes.h"
+#include "filtration_medial.h"
 #include "delaunay_helper.h"
 
 #include <fstream>
@@ -52,7 +52,7 @@ void FiltrationMedial::init_medial_info()
     // (which corresponds to Voronoi vertices)
     for (Delaunay::Cell_handle ch : m_dela.all_cell_handles())
     {
-        MedialInfo medinf;
+        MedialInfo medinf; // firstly: assign medinf
         if (m_dela.is_infinite(ch))
         {
             medinf.assign(MedialType::Outer, inf, Point(inf,inf,inf));
@@ -69,6 +69,7 @@ void FiltrationMedial::init_medial_info()
             medinf.assign(ch_type, radius, dual_point);
         }
 
+        // secondly: run through D-sub-faces
         const std::list<Delaunay::Simplex> faces = DelaunayHelper::D_sub_faces(ch);
         for (Delaunay::Simplex face_D : faces)
         {
@@ -285,8 +286,6 @@ void FiltrationMedial::add_critical_to_filter(MedialType med_type)
 /**
  * @brief FiltrationMedial::compute_delaunay_coboundary
  * Fill the m_coboundary map.
- * @Precondition : m_coboundary should have been instantiated with empty
- * vectors, by either make_inner_filter or make_outer_filter.
  */
 void FiltrationMedial::compute_delaunay_coboundary()
 {

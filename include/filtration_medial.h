@@ -1,5 +1,5 @@
-#ifndef FILTRATION_MEDIAL_AXES_H
-#define FILTRATION_MEDIAL_AXES_H
+#ifndef FILTRATION_MEDIAL_H
+#define FILTRATION_MEDIAL_H
 
 
 #include "cgal_typedef.h"
@@ -10,7 +10,7 @@
  * of a mesh file .off.
  */
 
-//enum class CellCritType {NonCritical, Critical};
+//enum class CellCritType {NonCritical, Critical}; // moved to delauney_helper.h
 enum class MedialType {Boundary, Inner, Outer};
 
 struct MedialInfo
@@ -86,4 +86,4 @@ private:
 };
 
 
-#endif // FILTRATION_MEDIAL_AXES_H
+#endif // FILTRATION_MEDIAL_H

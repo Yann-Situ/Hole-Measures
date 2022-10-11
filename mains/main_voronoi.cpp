@@ -1,4 +1,4 @@
-#include "filtration_v.h"
+#include "filtration_voronoi.h"
 #include "persistence.h"
 
 #include <vector>
@@ -22,16 +22,16 @@ int main(int argc, char* argv[])
     exit(EXIT_FAILURE);
   }
 
-  FiltrationV F(poly);
+  FiltrationVoronoi F(poly);
   F.init_Dcell_filtration_values();
   F.compute_infinite_voronoi_face_duals();
   F.make_filter();
   F.compute_delaunay_coboundary();
 
-  Persistence<FiltrationV::Simplex> pers(F);
+  Persistence<FiltrationVoronoi::Simplex> pers(F);
   pers.run_persistence();
   pers.compute_holes_from_pairs();
-  pers.save_tb_balls(m_filename, "_V.tb");
+  pers.save_present_holes(m_filename, ".voronoi.tb");
 
   return 0;
 }

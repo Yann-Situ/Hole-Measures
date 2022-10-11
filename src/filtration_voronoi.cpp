@@ -1,10 +1,10 @@
 /*
-FiltrationV
+FiltrationVoronoi
 computes the Voronoi filtration of a mesh.
 It is based on Aldo's code in something.cpp that compute the Delaunay filtration.
 */
 
-#include "filtration_v.h"
+#include "filtration_voronoi.h"
 #include "delaunay_helper.h"
 
 //#include <CGAL/draw_polyhedron.h>
@@ -29,7 +29,7 @@ inline double max3(double d1, double d2, double d3)
 
 //#############################################################################
 
-FiltrationV::FiltrationV(Polyhedron poly)
+FiltrationVoronoi::FiltrationVoronoi(Polyhedron poly)
     : m_poly(poly)
 {
     //CGAL::draw(m_poly);
@@ -50,10 +50,11 @@ FiltrationV::FiltrationV(Polyhedron poly)
 
 
 /**
- * @brief FiltrationV::init_Dcell_filtration_values
- * Assign filtration values to the cells in m_cell_filtration.
+ * @brief FiltrationVoronoi::init_Dcell_filtration_values
+ * Initialize m_cell_filtration by setting filtration values to every Dcells.
+ * (Dcell <-> Vvertex)
  */
-void FiltrationV::init_Dcell_filtration_values()
+void FiltrationVoronoi::init_Dcell_filtration_values()
 {
     m_cell_filtration.clear();
 
@@ -78,13 +79,13 @@ void FiltrationV::init_Dcell_filtration_values()
 }
 
 /**
- * @brief FiltrationV::make_filter
+ * @brief FiltrationVoronoi::make_filter
  * Create the filter and the filtration by filling m_filter and m_filtration
  * in the appropriate order : the simplices are sorted according to the
- * filter induced by the filtration values on the Dcells (3D-Delaunay-simplices).
+ * filter induced by the filtration values on the Dcells (m_cell_filtration).
  * Also initialize m_coboundary with empty lists.
  */
-void FiltrationV::make_filter()
+void FiltrationVoronoi::make_filter()
 {
     // sort cells by the filtration values
     std::vector<std::pair<double, Delaunay::Cell_handle>> pairs(m_cell_filtration.size());
@@ -93,7 +94,7 @@ void FiltrationV::make_filter()
     {
         pairs.at(i) = std::make_pair(kv.second, kv.first);
         i++;
-//        std::clog << kv.first << " has value " << kv.second << std::endl;
+        // std::clog << kv.first << " has value " << kv.second << std::endl;
     }
     std::sort(pairs.rbegin(), pairs.rend()); // in reverse order
 
@@ -103,25 +104,23 @@ void FiltrationV::make_filter()
     //m_point.clear();
     m_cell.clear();
     m_coboundary.clear();
-    for (auto pair : pairs) // decreasing sdf order
+    for (auto pair : pairs) // for every Dcell/Vvertex (in decreasing sdf order)
     {
-        const Delaunay::Cell_handle ch = pair.second; // current cell (3-simplex)
-        //const Delaunay::Point point = m_dela.dual(ch); // its corresponding point of the Voronoi diagram
+        const Delaunay::Cell_handle ch = pair.second; // current Dcell
         const std::list<Simplex> simplices = DelaunayHelper::D_sub_faces(ch);
 
-        for (Simplex simplex : simplices)
+        for (Simplex simplex : simplices) // for every D-sub-faces of Dcell (/ V-co-faces of the Vvertex)
         {
             if (m_coboundary.count(simplex) == 0 // if that simplex is not already added
             && infinite_voronoi_face_duals.count(simplex) == 0) // if its dual is finite
             {
-                //m_pos_in_filter[simplex] = 1; // useless for Voronoi filtration
                 m_filter.push_front(simplex);
                 /* WARNING push_front :
                  * As pairs is in decreasing sdf order, we want the last simplex
                  * of pair (with lowest sdf) to be the first of m_filter.
                  *
                  * pairs is in decreasing sdf in order to add a Delaunay cell at
-                 * the same time of its boundary cell that maximize sdf. */
+                 * the same time as the boundary cell that maximize sdf. */
                 m_filtration.push_front(pair.first);
                 //m_point.push_front(point);
                 m_cell.push_front(ch);
@@ -135,18 +134,19 @@ void FiltrationV::make_filter()
 }
 
 /**
- * @brief FiltrationV::compute_infinite_voronoi_face_duals
- * Set up the set infinite_voronoi_face_duals that should contains the duals
+ * @brief FiltrationVoronoi::compute_infinite_voronoi_face_duals
+ * Set up the infinite_voronoi_face_duals set that should contains the duals
  * of the infinite Voronoi cells.
  * These Delaunay cells are the infinite ones and those on the convex hull.
  */
-void FiltrationV::compute_infinite_voronoi_face_duals()
+void FiltrationVoronoi::compute_infinite_voronoi_face_duals()
 {
     infinite_voronoi_face_duals.clear();
     Delaunay::Vertex_handle inf_Dvertex = m_dela.infinite_vertex();
     std::list<Delaunay::Cell_handle> inf_Dcells;
     m_dela.incident_cells(inf_Dvertex,std::back_inserter(inf_Dcells));
     //std::cout << "IIV : " << inf_Dcells.size() << std::endl;
+    // run through every D-face of every Dcell incident to p_infinity (the infinite Dvertex).
     for (Delaunay::Cell_handle inf_Dcell : inf_Dcells)
     {
         const std::list<Simplex> simplices = DelaunayHelper::D_sub_faces(inf_Dcell);
@@ -161,18 +161,17 @@ void FiltrationV::compute_infinite_voronoi_face_duals()
 }
 
 /**
- * @brief FiltrationV::compute_delaunay_coboundary
+ * @brief FiltrationVoronoi::compute_delaunay_coboundary
  * Fill the m_coboundary map.
  * @Precondition : m_coboundary should have been instantiated with empty vectors.
  */
-void FiltrationV::compute_delaunay_coboundary()
+void FiltrationVoronoi::compute_delaunay_coboundary()
 {
     int pos = 0;
     /* Filling the coboundary vectors, which contains the positions of
      * Delaunay coboundary cells in m_filter */
     for (Simplex simplex : m_filter)
     {
-        //m_pos_in_filter[simplex] = pos;
         const std::list<Simplex> faces = DelaunayHelper::D_faces(simplex);
         for (Simplex face : faces)
         {
@@ -184,11 +183,11 @@ void FiltrationV::compute_delaunay_coboundary()
 }
 
 /**
- * @brief FiltrationV::is_on_boundary
+ * @brief FiltrationVoronoi::is_on_boundary
  * Check if the facet is on the boundary of the object.
  * @Precondition : m_cell_filtration should have been filled.
  */
-bool FiltrationV::is_on_boundary(const Delaunay::Facet f)
+bool FiltrationVoronoi::is_on_boundary(const Delaunay::Facet f)
 {
     Delaunay::Cell_handle c1 = f.first;
     Delaunay::Cell_handle c2 = m_dela.mirror_facet(f).first;
@@ -204,12 +203,12 @@ bool FiltrationV::is_on_boundary(const Delaunay::Facet f)
     return (sign(m_cell_filtration[c1]) != sign(m_cell_filtration[c2]));
 }
 /**
- * @brief FiltrationV::boundary_facets
+ * @brief FiltrationVoronoi::boundary_facets
  * Return a deque of the boundary facets.
  * @Precondition : m_cell_filtration and infinite_voronoi_face_duals should
  * have been filled.
  */
-std::deque<Delaunay::Facet> FiltrationV::boundary_facets()
+std::deque<Delaunay::Facet> FiltrationVoronoi::boundary_facets()
 {
     std::deque<Delaunay::Facet> b_facets;
     for (Delaunay::Facet f : m_dela.finite_facets())
@@ -221,7 +220,7 @@ std::deque<Delaunay::Facet> FiltrationV::boundary_facets()
 }
 
 /**
- * @brief FiltrationV::is_finite_medial
+ * @brief FiltrationVoronoi::is_finite_medial
  * Check if the simplex represents a part of the
  * finite-Voronoi-medial-axis-approx. More precisely, check if the Delaunay
  * simplex is not on the boundary and is not in infinite_voronoi_face_duals
@@ -229,7 +228,7 @@ std::deque<Delaunay::Facet> FiltrationV::boundary_facets()
  * @Precondition : m_cell_filtration and infinite_voronoi_face_duals should
  * have been filled.
  */
-bool FiltrationV::is_finite_medial(const Simplex s)
+bool FiltrationVoronoi::is_finite_medial(const Simplex s)
 {
     //SoT inside(m_poly);
     if (infinite_voronoi_face_duals.count(s) > 0)
@@ -291,7 +290,7 @@ bool FiltrationV::is_finite_medial(const Simplex s)
 
 
 /**
- * @brief FiltrationV::search_critical
+ * @brief FiltrationVoronoi::search_critical
  * Given a position of a cell in the filter, compute all the subfaces of its
  * parent Delaunay cell_handle (3-cell) and return the critical elements of
  * the subface that maximize (or minimize if !use_max) the distance to border
@@ -299,7 +298,7 @@ bool FiltrationV::is_finite_medial(const Simplex s)
  * @Precondition : m_cell, m_cell_filtration and infinite_voronoi_face_duals
  * should have been filled.
  */
-std::pair<Delaunay::Point, double> FiltrationV::search_critical(int pos, bool use_max)
+std::pair<Delaunay::Point, double> FiltrationVoronoi::search_critical(int pos, bool use_max)
 {
     int parentDcellpos = pos; Delaunay::Cell_handle parentDcell = m_cell[pos];
     const double r = m_filtration.at(pos);

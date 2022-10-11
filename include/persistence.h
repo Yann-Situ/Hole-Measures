@@ -42,8 +42,10 @@ public:
 
     void run_persistence();
     void compute_holes_from_pairs();
-    void save_tb_balls(std::string filename ,std::string extension = ".tb");
-    void save_holes(std::string filename ,std::string extension = ".holes");
+    void save_holes(std::string filename ,std::string extension = ".tb",
+        bool add_first_0_hole = false);
+    void save_present_holes(std::string filename ,std::string extension = ".tb",
+        bool add_first_0_hole = false);
     //void save_tb_pairs_bis(std::string filename ,std::string extension = "_V_bis.tb");
     phat::persistence_pairs get_tb_pairs() {return tb_pairs;}
     std::vector<HoleMeas> get_holes() {return holes;}
@@ -98,7 +100,9 @@ Persistence<Simplex>::Persistence(Filtration<Simplex>& f)
         std::sort(temp_col.begin(), temp_col.end()); // @note This is very important! // they should already be sorted
         boundary_matrix.set_col( i, temp_col );
     }
-    std::clog << "-- the boundary matrix has " << boundary_matrix.get_num_cols() << " columns and " << boundary_matrix.get_num_entries() << " entries." << std::endl;
+    std::clog << "-- the boundary matrix has " << boundary_matrix.get_num_cols()
+    << " columns and " << boundary_matrix.get_num_entries() << " entries."
+    << std::endl;
     //boundary_matrix.save_ascii("phat_boundary.dat");
 }
 
@@ -111,7 +115,7 @@ void Persistence<Simplex>::run_persistence()
 {
     // compute persistence pairs
     tb_pairs.clear();
-    phat::compute_persistence_pairs< phat::chunk_reduction >( tb_pairs, boundary_matrix );
+    phat::compute_persistence_pairs<phat::chunk_reduction>(tb_pairs, boundary_matrix);
     std::clog << "-- persistence pairs computed" << std::endl;
 }
 
@@ -125,7 +129,7 @@ template <class Simplex>
 void Persistence<Simplex>::compute_holes_from_pairs()
 {
     holes.clear();
-    for( phat::index idx = 0; idx < tb_pairs.get_num_pairs(); idx++ )
+    for(phat::index idx = 0; idx < tb_pairs.get_num_pairs(); idx++)
     {
         const int t_index = tb_pairs.get_pair(idx).first;
         const int b_index = tb_pairs.get_pair(idx).second;
@@ -137,47 +141,14 @@ void Persistence<Simplex>::compute_holes_from_pairs()
     std::clog << "-- holes computed" << std::endl;
 }
 
-
-/**
- * @brief Persistence<Simplex>::save_tb_balls
- * Save the tb ball pairs that have negative birth date and positive death rate
- * in a file filename+extension.
- * @Precondition : holes should have been computed.
- */
-template <class Simplex>
-void Persistence<Simplex>::save_tb_balls(std::string filename ,std::string extension)
-{
-    // extract the TB balls
-    std::cout << "Writting the TB file, recall that each line contains: " << std::endl
-              << "dimension t_radius t_center[3] b_radius b_center[3]" << std::endl;
-    std::ofstream file(filename + extension, std::ios::out | std::ios::trunc);
-    if (!(file))
-    {
-        std::cerr << "Error in Persistence<Simplex>::save_tb_balls(): impossible to create the output text file." << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    for(HoleMeas hole : holes)
-    {
-        if (hole.T.r > 0 && hole.B.r > 0)
-        {
-            file << hole << std::endl;
-        }
-    }
-    // add the unpaired cell
-    file << "0 "
-         << - ft.get_filtration(0) << " " << ft.get_point(0) << " "
-         << "inf" << std::endl;
-
-    file.close();
-}
-
 /**
  * @brief Persistence<Simplex>::save_holes
- * Save the every holes in a file filename+extension.
+ * Save the every hole measures in a file filename+extension.
  * @Precondition : holes should have been computed.
  */
 template <class Simplex>
-void Persistence<Simplex>::save_holes(std::string filename ,std::string extension)
+void Persistence<Simplex>::save_holes(std::string filename,
+    std::string extension, bool add_first_0_hole)
 {
     // extract the TB balls
     std::cout << "Writting the TB file, recall that each line contains: " << std::endl
@@ -193,10 +164,48 @@ void Persistence<Simplex>::save_holes(std::string filename ,std::string extensio
         if (hole.T.r > -hole.B.r)
             file << hole << std::endl;
     }
-    // // add the unpaired cell
-    // file << "0 "
-    //      << - ft.get_filtration(0) << " " << ft.get_point(0) << " "
-    //      << "inf" << std::endl;
+    if(add_first_0_hole) // add the unpaired cell
+    {
+        file << "0 "
+        << - ft.get_filtration(0) << " " << ft.get_point(0) << " "
+        << "inf" << std::endl;
+    }
+
+    file.close();
+}
+
+/**
+ * @brief Persistence<Simplex>::save_tb_balls
+ * Save the tb ball pairs that have negative birth date and positive death rate
+ * in a file filename+extension.
+ * @Precondition : holes should have been computed.
+ */
+template <class Simplex>
+void Persistence<Simplex>::save_present_holes(std::string filename,
+    std::string extension, bool add_first_0_hole)
+{
+    // extract the TB balls
+    std::cout << "Writting the TB file, recall that each line contains: " << std::endl
+              << "dimension t_radius t_center[3] b_radius b_center[3]" << std::endl;
+    std::ofstream file(filename + extension, std::ios::out | std::ios::trunc);
+    if (!(file))
+    {
+        std::cerr << "Error in Persistence<Simplex>::save_present_holes(): impossible to create the output text file." << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    for(HoleMeas hole : holes)
+    {
+        if (hole.T.r > 0 && hole.B.r > 0)
+        {
+            file << hole << std::endl;
+        }
+    }
+    if(add_first_0_hole) // add the unpaired cell
+    {
+        file << "0 "
+        << - ft.get_filtration(0) << " " << ft.get_point(0) << " "
+        << "inf" << std::endl;
+    }
 
     file.close();
 }

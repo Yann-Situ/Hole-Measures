@@ -51,7 +51,7 @@
           <bool>false</bool>
          </property>
          <property name="text">
-          <string>TEST</string>
+          <string>Hole Measure Viewer</string>
          </property>
         </widget>
        </item>

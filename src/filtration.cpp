@@ -1,7 +1,6 @@
 /*
 Filtration
-computes the Voronoi filtration of a mesh.
-It is based on Aldo's code in something.cpp that compute the Delaunay filtration.
+Upper class of filtration_voronoi and filtration_medial
 */
 
 #include "filtration.h"

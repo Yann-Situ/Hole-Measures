@@ -71,7 +71,7 @@ void Resampling::write_off(Polyhedron m_poly)
 /*############################################################################*/
 
 /**
- * @brief FiltrationV::criteria_1
+ * @brief FiltrationVoronoi::criteria_1
  * Check if the height of the tetrahedra of f is above
  * sqrt(parameter)*max_{e edge of f}(||e||)
  */

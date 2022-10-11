@@ -1,4 +1,4 @@
-#include "filtration_v.h"
+#include "filtration_voronoi.h"
 #include "resampling.h"
 //#include "persistence.h"
 #include <CGAL/draw_triangulation_3.h>
@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
   const double facet_size_refinement = (argc > 2) ? std::stod(std::string(argv[2])) : 1.0;
   const double edge_size_refinement = (argc > 3) ? std::stod(std::string(argv[3])) : 0.025;
 
-  FiltrationV F(poly);
+  FiltrationVoronoi F(poly);
 
   // //Resampling::add_circumcenters(S.m_dela, S.m_poly);
   // SoT inside(F.m_poly);
