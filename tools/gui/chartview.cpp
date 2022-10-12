@@ -52,11 +52,14 @@ void ChartView::load_pairs(std::vector<int> dim, std::vector<double> x, std::vec
     m_pairs_2->clear();
 
     // add pairs to the series
-    double max_value = 0;
+    double max_value = 0.0;
+    double min_value = 0.0;
     for (std::size_t i = 0; i < dim.size(); ++i)
     {
         max_value = std::max(max_value, x.at(i));
         max_value = std::max(max_value, y.at(i));
+        min_value = std::min(min_value, x.at(i));
+        min_value = std::min(min_value, y.at(i));
         if (dim.at(i) == 0)
             m_pairs_0->append(x.at(i), y.at(i));
         else if (dim.at(i) == 1)
@@ -65,8 +68,8 @@ void ChartView::load_pairs(std::vector<int> dim, std::vector<double> x, std::vec
             m_pairs_2->append(x.at(i), y.at(i));
     }
     chart()->createDefaultAxes();
-    chart()->axes(Qt::Horizontal).first()->setRange(0, 1.1 * max_value);
-    chart()->axes(Qt::Vertical  ).first()->setRange(0, 1.1 * max_value);
+    chart()->axes(Qt::Horizontal).first()->setRange(1.1 * min_value, 1.1 * max_value);
+    chart()->axes(Qt::Vertical  ).first()->setRange(1.1 * min_value, 1.1 * max_value);
 }
 
 

@@ -135,10 +135,7 @@ void MainWindow::read_tb()
         iss >> ball.t_radius;
         iss >> ball.t_x >> ball.t_y >> ball.t_z;
         iss >> ball.b_radius;
-        if (ball.b_radius > 0)
-        {
-            iss >> ball.b_x >> ball.b_y >> ball.b_z;
-        }
+        iss >> ball.b_x >> ball.b_y >> ball.b_z;
         m_tb_balls.push_back(ball);
     }
     file.close();
@@ -162,7 +159,7 @@ void MainWindow::read_tb()
 
 void MainWindow::show_tb_balls(const std::vector<TBball>& balls)
 {
-    const int divs = 8;
+    const int divs = 16;
     const double inc = 3.14159265359 / (divs);
     // count faces to display
 
@@ -172,6 +169,7 @@ void MainWindow::show_tb_balls(const std::vector<TBball>& balls)
     // precompute the vertices coordinates
     std::vector<std::vector<std::vector<double>>> vertices_vec;
     std::vector<bool> thickness_balls;
+    std::vector<size_t> ball_hole_index;
     std::vector<double> v(3, 0);
 
     ui->text_HoleInfo->clear();
@@ -205,6 +203,7 @@ void MainWindow::show_tb_balls(const std::vector<TBball>& balls)
             }
             vertices_vec.push_back(vertices);
             thickness_balls.push_back(true);
+            ball_hole_index.push_back(k);
         }
         if (ui->comboBox_TBchoice->currentIndex() == 1 || ui->comboBox_TBchoice->currentIndex() == 2)
         {
@@ -229,6 +228,7 @@ void MainWindow::show_tb_balls(const std::vector<TBball>& balls)
             }
             vertices_vec.push_back(vertices);
             thickness_balls.push_back(false);
+            ball_hole_index.push_back(k);
         }
 
         ui->text_HoleInfo->append("dim: " +
@@ -249,15 +249,33 @@ void MainWindow::show_tb_balls(const std::vector<TBball>& balls)
     {
         if (thickness_balls.at(k))
         {
-            color[0] = 250;
-            color[1] = 40;
-            color[2] = 80;
+            if (balls.at(ball_hole_index[k]).t_radius > 0.0)
+            {
+                color[0] = 250;
+                color[1] = 40;
+                color[2] = 80;
+            }
+            else
+            {
+                color[0] = 250;
+                color[1] = 100;
+                color[2] = 200;
+            }
         }
         else
         {
-            color[0] = 20;
-            color[1] = 80;
-            color[2] = 200;
+            if (balls.at(ball_hole_index[k]).b_radius > 0.0)
+            {
+                color[0] = 40;
+                color[1] = 80;
+                color[2] = 250;
+            }
+            else
+            {
+                color[0] = 100;
+                color[1] = 200;
+                color[2] = 250;
+            }
         }
         // Put triangular faces
         for(int p = 0; p < 2*divs; p++)
@@ -409,19 +427,19 @@ void MainWindow::resetAllColorsAndThickness(MyMesh* _mesh)
     // set thickness (1) and color (black) for vertices
     for (MyMesh::VertexIter curVert = _mesh->vertices_begin(); curVert != _mesh->vertices_end(); curVert++)
     {
-        _mesh->data(*curVert).thickness = 1;
+        _mesh->data(*curVert).thickness = 2;
         _mesh->set_color(*curVert, MyMesh::Color(0, 0, 0));
     }
-    // set color (gray) for faces
+    // set color (light gray) for faces
     for (MyMesh::FaceIter curFace = _mesh->faces_begin(); curFace != _mesh->faces_end(); curFace++)
     {
-        _mesh->set_color(*curFace, MyMesh::Color(150, 150, 150));
+        _mesh->set_color(*curFace, MyMesh::Color(220, 220, 220));
     }
-    // set thickness (1) and color (black) for vertices
+    // set thickness (1) and color (dark gray) for edges
     for (MyMesh::EdgeIter curEdge = _mesh->edges_begin(); curEdge != _mesh->edges_end(); curEdge++)
     {
         _mesh->data(*curEdge).thickness = 1;
-        _mesh->set_color(*curEdge, MyMesh::Color(0, 0, 0));
+        _mesh->set_color(*curEdge, MyMesh::Color(90, 90, 90));
     }
 }
 

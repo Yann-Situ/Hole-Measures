@@ -29,6 +29,20 @@ void MeshViewerWidget::initializeGL()
     set_scene_pos(Vec3f(0.0, 0.0, 0.0), 1.0);
 
     glEnable( GL_MULTISAMPLE );
+
+    // glShadeModel(GL_SMOOTH);//Enable shadow smoothing
+    //
+    // GLfloat LightAmbient[] = {0.5f, 0.5f, 0.6f, 1.0f};//Ambient light parameters
+    // GLfloat LightDiffuse[] = {0.6f, 0.6f, 0.5f, 1.0f};//Diffuse light parameters
+    // GLfloat LightPosition[] = {0.0f, 0.0f, 1.0f, 0.0f};//light source position
+    // glLightfv(GL_LIGHT1, GL_AMBIENT, LightAmbient);//Set the ambient light
+    // glLightfv(GL_LIGHT1, GL_DIFFUSE, LightDiffuse);//Set diffuse light
+    // glLightfv(GL_LIGHT1, GL_POSITION, LightPosition);//Set the light source position
+    // glEnable(GL_LIGHT1);//Start light source No. 1
+    //
+    // glEnable(GL_LIGHTING);
+    // glEnable(GL_COLOR_MATERIAL);
+    // glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 }
 
 void MeshViewerWidget::translate( const OpenMesh::Vec3f& _trans )

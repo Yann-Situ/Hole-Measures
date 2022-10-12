@@ -89,7 +89,7 @@ Persistence<Simplex>::Persistence(Filtration<Simplex>& f)
     for (std::size_t i = 0; i < f.get_filter_size(); i++)
     {
         const Simplex &s = f.get_filter(i);
-        boundary_matrix.set_dim( i, 3-s.dimension() );
+        boundary_matrix.set_dim(i, 3-s.dimension());
         temp_col.resize(m_coboundary.at(s).size());
         int j = 0;
         for (const int coface_pos : m_coboundary.at(s))
@@ -128,16 +128,32 @@ void Persistence<Simplex>::run_persistence()
 template <class Simplex>
 void Persistence<Simplex>::compute_holes_from_pairs()
 {
+    std::set<int> c;
+    for (int i = 0; i < ft.get_filter_size(); i++) {
+        c.insert(i);
+    }
+
     holes.clear();
     for(phat::index idx = 0; idx < tb_pairs.get_num_pairs(); idx++)
     {
         const int t_index = tb_pairs.get_pair(idx).first;
         const int b_index = tb_pairs.get_pair(idx).second;
+        c.erase(b_index);
+        c.erase(t_index);
         const int dimension = 3-ft.get_filter(t_index).dimension();
         const TBball T(-ft.get_filtration(t_index), ft.get_point(t_index));
         const TBball B(ft.get_filtration(b_index), ft.get_point(b_index));
         holes.push_back(HoleMeas(T,B,dimension));
     }
+    std::clog << "set of non closing cells : ";
+    std::cout << "c = { ";
+    for (int n : c)
+        std::cout << n << ' ';
+    std::cout << "}\n";
+    std::cout << "v = { ";
+    for (int n : c)
+        std::cout << ft.get_filtration(n) << ' ';
+    std::cout << "}\n";
     std::clog << "-- holes computed" << std::endl;
 }
 
