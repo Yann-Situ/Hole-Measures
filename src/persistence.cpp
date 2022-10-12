@@ -31,7 +31,7 @@ std::ostream& operator<< (std::ostream &out, const HoleMeas &pair)
  */
 void alexander_deduction(std::vector<HoleMeas>& holes)
 {
-    for (HoleMeas hm : holes)
+    for (HoleMeas& hm : holes)
     {
         const TBball temp = hm.T;
         hm.T = hm.B; hm.B = temp;
@@ -95,4 +95,60 @@ void tb_pairing(
             output.push_back(HoleMeas(lone_t[dim][i].T, lone_b[dim][i].B, dim));
         }
     }
+}
+
+/**
+ * @brief Persistence<Simplex>::save_holes_criteria
+ * Save the hole measures in a file filename+extension that verifies
+ * criteria(T.r, B.r).
+ * @Precondition : holes should have been computed.
+ */
+void save_holes_criteria(std::vector<HoleMeas> holes, std::string filename,
+    bool (*criteria)(double,double), std::string extension)
+{
+    // extract the TB balls
+    std::cout << "Writting the TB file, recall that each line contains: " << std::endl
+              << "dimension t_radius t_center[3] b_radius b_center[3]" << std::endl;
+    std::ofstream file(filename + extension, std::ios::out | std::ios::trunc);
+    if (!(file))
+    {
+        std::cerr << "Error in Persistence<Simplex>::save_holes(): impossible to create the output text file." << std::endl;
+        exit(EXIT_FAILURE);
+    }
+    for(HoleMeas hole : holes)
+    {
+        if (criteria(hole.T.r, hole.B.r))
+            file << hole << std::endl;
+    }
+    file.close();
+}
+
+//bool valid_hole(double t, double b){return t > -b;};
+//bool present_hole(double t, double b){return t > 0 && b > 0;};
+
+/**
+ * @brief Persistence<Simplex>::save_holes
+ * Save the every hole measures in a file filename+extension.
+ * @Precondition : holes should have been computed.
+ */
+void save_holes(std::vector<HoleMeas> holes, std::string filename,
+    std::string extension)
+{
+    save_holes_criteria(holes, filename,
+        [](double t, double b) -> bool {return t > -b;},
+        extension);
+}
+
+/**
+ * @brief Persistence<Simplex>::save_tb_balls
+ * Save the tb ball pairs that have negative birth date and positive death rate
+ * in a file filename+extension.
+ * @Precondition : holes should have been computed.
+ */
+void save_present_holes(std::vector<HoleMeas> holes, std::string filename,
+    std::string extension)
+{
+    save_holes_criteria(holes, filename,
+        [](double t, double b) -> bool {return t > 0 && b > 0;},
+        extension);
 }

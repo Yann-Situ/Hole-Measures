@@ -162,6 +162,43 @@ void FiltrationMedial::make_filter(MedialType med_type)
     std::clog << "-- filter computed: filter size is " << filter.size() << " simplices" << std::endl;
 }
 
+
+/**
+ * @brief FiltrationMedial::compute_delaunay_coboundary
+ * Fill the m_coboundary map.
+ */
+void FiltrationMedial::compute_delaunay_coboundary()
+{
+    m_coboundary.clear();
+    for (const auto& pair : filter) // decreasing sdf order
+    {
+        std::vector<int> c; // empty vector of coboundary for the moment.
+        /* Coboundary corresponds to Delaunay coboundary,
+         * which are duals of Voronoi boundary*/
+
+        //std::clog << pair.first.id() << "\t";
+        m_coboundary[pair.first] = c;
+    }
+
+    /* Filling the coboundary vectors, which contains the positions of
+     * Delaunay coboundary cells in m_filter */
+    int pos = 0;
+    for (const auto& pair : filter)
+    {
+        for (Simplex face : simplex_faces[pair.first].first)
+        {
+            auto it_cobound_find = m_coboundary.find(face);
+            if (it_cobound_find != m_coboundary.end())
+                it_cobound_find->second.push_back(pos);
+
+        }
+        pos++;
+    }
+    std::clog << "-- Delaunay coboundary computed" << std::endl;
+}
+
+/****************************** Work in Progress ******************************/
+
 /**
  * @brief FiltrationMedial::add_critical_to_filter
  * Add every critical simplices (with med_type) to the simplicial complex
@@ -281,38 +318,4 @@ void FiltrationMedial::add_critical_to_filter(MedialType med_type)
         }
     }
     std::clog << addcount << " adds and " << critcount << " crits" << '\n';
-}
-
-/**
- * @brief FiltrationMedial::compute_delaunay_coboundary
- * Fill the m_coboundary map.
- */
-void FiltrationMedial::compute_delaunay_coboundary()
-{
-    m_coboundary.clear();
-    for (const auto& pair : filter) // decreasing sdf order
-    {
-        std::vector<int> c; // empty vector of coboundary for the moment.
-        /* Coboundary corresponds to Delaunay coboundary,
-         * which are duals of Voronoi boundary*/
-
-        //std::clog << pair.first.id() << "\t";
-        m_coboundary[pair.first] = c;
-    }
-
-    /* Filling the coboundary vectors, which contains the positions of
-     * Delaunay coboundary cells in m_filter */
-    int pos = 0;
-    for (const auto& pair : filter)
-    {
-        for (Simplex face : simplex_faces[pair.first].first)
-        {
-            auto it_cobound_find = m_coboundary.find(face);
-            if (it_cobound_find != m_coboundary.end())
-                it_cobound_find->second.push_back(pos);
-
-        }
-        pos++;
-    }
-    std::clog << "-- Delaunay coboundary computed" << std::endl;
 }

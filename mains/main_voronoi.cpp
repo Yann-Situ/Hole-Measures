@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
   Persistence<FiltrationVoronoi::Simplex> pers(F);
   pers.run_persistence();
   pers.compute_holes_from_pairs();
-  pers.save_present_holes(m_filename, ".voronoi.tb");
+  save_present_holes(pers.get_holes(), m_filename, ".voronoi.tb");
 
   return 0;
 }

@@ -87,7 +87,7 @@ void MainWindow::read_mesh()
     // fenêtre de sélection des fichiers
     const QString fileName = QFileDialog::getOpenFileName(this, tr("Open Mesh"), "../../data", tr("Mesh Files (*.obj, *.off)"));
     m_filebasename = QFileInfo(fileName).baseName();
-    setWindowTitle("Yann-topo GUI - " + QFileInfo(fileName).fileName());
+    setWindowTitle("Hole Measures GUI - " + QFileInfo(fileName).fileName());
 
     // if no file was chosen, stop here
     if (fileName.isEmpty()) return;

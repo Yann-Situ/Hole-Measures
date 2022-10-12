@@ -42,11 +42,7 @@ public:
 
     void run_persistence();
     void compute_holes_from_pairs();
-    void save_holes(std::string filename ,std::string extension = ".tb",
-        bool add_first_0_hole = false);
-    void save_present_holes(std::string filename ,std::string extension = ".tb",
-        bool add_first_0_hole = false);
-    //void save_tb_pairs_bis(std::string filename ,std::string extension = "_V_bis.tb");
+
     phat::persistence_pairs get_tb_pairs() {return tb_pairs;}
     std::vector<HoleMeas> get_holes() {return holes;}
 
@@ -62,6 +58,14 @@ void tb_pairing(
     const std::vector<HoleMeas>& t_holes,
     const std::vector<HoleMeas>& b_holes,
     std::vector<HoleMeas>& output);
+void save_holes_criteria(std::vector<HoleMeas> holes, std::string filename,
+    bool (*criteria)(double,double),
+    std::string extension = ".tb");
+void save_holes(std::vector<HoleMeas> holes, std::string filename,
+    std::string extension = ".tb");
+void save_present_holes(std::vector<HoleMeas> holes, std::string filename,
+    std::string extension = ".tb");
+//void save_tb_pairs_bis(std::string filename ,std::string extension = "_V_bis.tb");
 
 /*############################################################################*/
 /*############################# Persistence class ############################*/
@@ -128,9 +132,9 @@ void Persistence<Simplex>::run_persistence()
 template <class Simplex>
 void Persistence<Simplex>::compute_holes_from_pairs()
 {
-    std::set<int> c;
+    std::set<int> unseen_index;
     for (int i = 0; i < ft.get_filter_size(); i++) {
-        c.insert(i);
+        unseen_index.insert(i);
     }
 
     holes.clear();
@@ -138,152 +142,32 @@ void Persistence<Simplex>::compute_holes_from_pairs()
     {
         const int t_index = tb_pairs.get_pair(idx).first;
         const int b_index = tb_pairs.get_pair(idx).second;
-        c.erase(b_index);
-        c.erase(t_index);
+        unseen_index.erase(b_index);
+        unseen_index.erase(t_index);
         const int dimension = 3-ft.get_filter(t_index).dimension();
         const TBball T(-ft.get_filtration(t_index), ft.get_point(t_index));
         const TBball B(ft.get_filtration(b_index), ft.get_point(b_index));
         holes.push_back(HoleMeas(T,B,dimension));
     }
-    std::clog << "set of non closing cells : ";
-    std::cout << "c = { ";
-    for (int n : c)
-        std::cout << n << ' ';
-    std::cout << "}\n";
-    std::cout << "v = { ";
-    for (int n : c)
-        std::cout << ft.get_filtration(n) << ' ';
-    std::cout << "}\n";
+
+    const double inf = std::numeric_limits<double>::infinity();
+    /* Due to the persistence algorithm (hidden in compute_persistence_pairs),
+     * the unseen_index represent the holes that never died and are still
+     * present at the end of the filtration.
+     * The first 0-hole is also in this case. */
+    for (int n : unseen_index)
+    {
+        const int dimension = 3-ft.get_filter(n).dimension();
+        const TBball T(-ft.get_filtration(n), ft.get_point(n));
+
+        /* actually there is no point associated with the B-measure: putting
+         * p_infinity is theoretically wrong, but used for implementation
+         * simplicity.*/
+        const TBball B(inf, Point(inf,inf,inf));
+        holes.push_back(HoleMeas(T,B,dimension));
+    }
     std::clog << "-- holes computed" << std::endl;
 }
-
-/**
- * @brief Persistence<Simplex>::save_holes
- * Save the every hole measures in a file filename+extension.
- * @Precondition : holes should have been computed.
- */
-template <class Simplex>
-void Persistence<Simplex>::save_holes(std::string filename,
-    std::string extension, bool add_first_0_hole)
-{
-    // extract the TB balls
-    std::cout << "Writting the TB file, recall that each line contains: " << std::endl
-              << "dimension t_radius t_center[3] b_radius b_center[3]" << std::endl;
-    std::ofstream file(filename + extension, std::ios::out | std::ios::trunc);
-    if (!(file))
-    {
-        std::cerr << "Error in Persistence<Simplex>::save_holes(): impossible to create the output text file." << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    for(HoleMeas hole : holes)
-    {
-        if (hole.T.r > -hole.B.r)
-            file << hole << std::endl;
-    }
-    if(add_first_0_hole) // add the unpaired cell
-    {
-        file << "0 "
-        << - ft.get_filtration(0) << " " << ft.get_point(0) << " "
-        << "inf" << std::endl;
-    }
-
-    file.close();
-}
-
-/**
- * @brief Persistence<Simplex>::save_tb_balls
- * Save the tb ball pairs that have negative birth date and positive death rate
- * in a file filename+extension.
- * @Precondition : holes should have been computed.
- */
-template <class Simplex>
-void Persistence<Simplex>::save_present_holes(std::string filename,
-    std::string extension, bool add_first_0_hole)
-{
-    // extract the TB balls
-    std::cout << "Writting the TB file, recall that each line contains: " << std::endl
-              << "dimension t_radius t_center[3] b_radius b_center[3]" << std::endl;
-    std::ofstream file(filename + extension, std::ios::out | std::ios::trunc);
-    if (!(file))
-    {
-        std::cerr << "Error in Persistence<Simplex>::save_present_holes(): impossible to create the output text file." << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    for(HoleMeas hole : holes)
-    {
-        if (hole.T.r > 0 && hole.B.r > 0)
-        {
-            file << hole << std::endl;
-        }
-    }
-    if(add_first_0_hole) // add the unpaired cell
-    {
-        file << "0 "
-        << - ft.get_filtration(0) << " " << ft.get_point(0) << " "
-        << "inf" << std::endl;
-    }
-
-    file.close();
-}
-
-/*
-template <class Simplex>
-void Persistence<Simplex>::save_tb_pairs_bis(std::string filename ,std::string extension)
-{
-    auto m_filtration = ft.get_filtration();
-    auto m_filter = ft.get_filter();
-    auto m_cell = ft.get_m_cell();
-
-    // extract the TB balls
-    std::cout << "Writting the TB file, recall that each line contains: " << std::endl
-              << "dimension t_radius t_center[3] b_radius b_center[3]" << std::endl;
-    std::ofstream file(filename + extension, std::ios::out | std::ios::trunc);
-    if (!(file))
-    {
-        std::cerr << "Error in Persistence<Simplex>::compute_pairs(): impossible to create the output text file." << std::endl;
-        exit(EXIT_FAILURE);
-    }
-    for( phat::index idx = 0; idx < tb_pairs.get_num_pairs(); idx++ )
-    {
-        //        std::cout << "Birth: " << pairs.get_pair( idx ).first << ", Death: " << pairs.get_pair( idx ).second << std::endl;
-        int t_pos = tb_pairs.get_pair(idx).first;
-        int b_pos = tb_pairs.get_pair(idx).second;
-
-        const double t_value = m_filtration.at(t_pos);
-        const double b_value = m_filtration.at(b_pos);
-        if (t_value < 0 && b_value > 0)
-        {
-            const int dim = 3-m_filter.at(t_pos).dimension();
-            std::tuple<Delaunay::Point, double> t_pr;
-            std::tuple<Delaunay::Point, double> b_pr;
-            std::clog << "______________\n" << dim << "-hole :" << std::endl;
-            if (dim==0) {
-                t_pr = ft.search_critical(t_pos, true);// we want a dist max
-                b_pr = ft.search_critical(b_pos, false);// we want a dist min
-            }
-            else if (dim==1) {
-                // actually we want saddles for dim1...
-                t_pr = std::make_tuple(ft.m_dela.dual(m_cell.at(t_pos)), t_value);
-                b_pr = std::make_tuple(ft.m_dela.dual(m_cell.at(b_pos)), b_value);
-            }
-            else {
-                t_pr = ft.search_critical(t_pos, false);// we want a dist min
-                b_pr = ft.search_critical(b_pos, true);// we want a dist max
-            }
-
-            file << dim << " "
-                 << -std::get<1>(t_pr) << " " << std::get<0>(t_pr) << " "
-                 << std::get<1>(b_pr) << " " << std::get<0>(b_pr) << " " << std::endl;
-        }
-    }
-    // add the unpaired cell
-    file << "0 "
-         << - m_filtration.front() << " " << ft.m_dela.dual(m_cell.front()) << " "
-         << "inf" << std::endl;
-
-    file.close();
-}
-*/
 
 
 //#include "../src/persistence.tpp"
