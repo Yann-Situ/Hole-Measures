@@ -41,7 +41,7 @@ public:
     Persistence(Filtration<Simplex>& f);
 
     void run_persistence();
-    void compute_holes_from_pairs();
+    void compute_holes_from_pairs(bool add_first_0_hole = true);
 
     phat::persistence_pairs get_tb_pairs() {return tb_pairs;}
     std::vector<HoleMeas> get_holes() {return holes;}
@@ -130,10 +130,10 @@ void Persistence<Simplex>::run_persistence()
  * @Precondition : tb_pairs should have been computed (eg by run_persistence).
  */
 template <class Simplex>
-void Persistence<Simplex>::compute_holes_from_pairs()
+void Persistence<Simplex>::compute_holes_from_pairs(bool add_first_0_hole)
 {
     std::set<int> unseen_index;
-    for (int i = 0; i < ft.get_filter_size(); i++) {
+    for (int i = (add_first_0_hole) ? 0 : 1 ; i < ft.get_filter_size(); i++) {
         unseen_index.insert(i);
     }
 

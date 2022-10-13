@@ -37,6 +37,7 @@ void alexander_deduction(std::vector<HoleMeas>& holes)
         hm.T = hm.B; hm.B = temp;
         hm.dimension = 3-hm.dimension-1;
     }
+    std::clog << "-- alexander deduction done" << std::endl;
 }
 
 /**
@@ -95,6 +96,7 @@ void tb_pairing(
             output.push_back(HoleMeas(lone_t[dim][i].T, lone_b[dim][i].B, dim));
         }
     }
+    std::clog << "-- lone balls paired arbitrarily" << std::endl;
 }
 
 /**
@@ -107,12 +109,11 @@ void save_holes_criteria(std::vector<HoleMeas> holes, std::string filename,
     bool (*criteria)(double,double), std::string extension)
 {
     // extract the TB balls
-    std::cout << "Writting the TB file, recall that each line contains: " << std::endl
-              << "dimension t_radius t_center[3] b_radius b_center[3]" << std::endl;
     std::ofstream file(filename + extension, std::ios::out | std::ios::trunc);
     if (!(file))
     {
-        std::cerr << "Error in Persistence<Simplex>::save_holes(): impossible to create the output text file." << std::endl;
+        std::cerr << "Error in Persistence<Simplex>::save_holes_criteria(): "
+        << "impossible to create the output text file." << std::endl;
         exit(EXIT_FAILURE);
     }
     for(HoleMeas hole : holes)
@@ -121,6 +122,9 @@ void save_holes_criteria(std::vector<HoleMeas> holes, std::string filename,
             file << hole << std::endl;
     }
     file.close();
+    std::cout << "-- .tb file written, recall that each line contains: " << std::endl
+              << "dimension t_radius t_center[3] b_radius b_center[3]" << std::endl;
+
 }
 
 //bool valid_hole(double t, double b){return t > -b;};

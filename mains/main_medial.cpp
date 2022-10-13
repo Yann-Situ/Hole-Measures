@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
 
     if      (argc > 2 && std::string(argv[2]) == "-i")
     {
-        std::clog << "Using Inner Medial axis filtration" << std::endl;
+        std::clog << "Using Inner Medial Axis Filtration" << std::endl;
         F.make_filter(MedialType::Inner);
         F.compute_delaunay_coboundary();
 
@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
     }
     else if (argc > 2 && std::string(argv[2]) == "-o")
     {
-        std::clog << "Using Outer Medial axis filtration" << std::endl;
+        std::clog << "Using Outer Medial Axis Filtration" << std::endl;
         F.make_filter(MedialType::Outer);
         F.compute_delaunay_coboundary();
 
@@ -50,28 +50,35 @@ int main(int argc, char* argv[])
     }
     else
     {
-        std::clog << "Using Inner and Outer Medial axis filtration combined" << std::endl;
+        std::clog << "Using Inner and Outer Medial Axis Filtration combined" << std::endl;
 
+        std::clog << "- Outer Filtration:" << std::endl;
         F.make_filter(MedialType::Outer);
         F.compute_delaunay_coboundary();
         Persistence<FiltrationMedial::Simplex> pers_out(F);
         pers_out.run_persistence();
-        pers_out.compute_holes_from_pairs();
+        pers_out.compute_holes_from_pairs(false);
+        // don't add the first 0-hole because we don't want to pair it
 
         /* we perform the inner filtration after the outer one in order to add
-         * the first 0-hole easily at the end of the computations.*/
+         * the first 0-hole easily at the end of the computations:
+         */
+        std::clog << "- Inner Filtration:" << std::endl;
         F.make_filter(MedialType::Inner);
         F.compute_delaunay_coboundary();
         Persistence<FiltrationMedial::Simplex> pers_in(F);
         pers_in.run_persistence();
-        pers_in.compute_holes_from_pairs();
+        pers_in.compute_holes_from_pairs(false);
+        // don't add the first 0-hole because we don't want to pair it
 
+        std::clog << "- Hole Deduction:" << std::endl;
         std::vector<HoleMeas> holes_in = pers_in.get_holes();
         std::vector<HoleMeas> holes_out = pers_out.get_holes();
         std::vector<HoleMeas> holes;
         alexander_deduction(holes_out);
         tb_pairing(holes_in, holes_out, holes);
-        // the tb_pairing paired every balls but deleted the first 0-hole t-ball:
+
+        // Add the first 0-hole t-ball:
         const double inf = std::numeric_limits<double>::infinity();
         const TBball T(-F.get_filtration(0), F.get_point(0));
         const TBball B(inf, Point(inf,inf,inf));
