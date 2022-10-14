@@ -104,12 +104,12 @@ void FiltrationVoronoi::make_filter()
     //m_point.clear();
     m_cell.clear();
     m_coboundary.clear();
-    for (auto pair : pairs) // for every Dcell/Vvertex (in decreasing sdf order)
+    for (auto pair : pairs) // for every Dcell (in decreasing sdf order)
     {
         const Delaunay::Cell_handle ch = pair.second; // current Dcell
-        const std::list<Simplex> simplices = DelaunayHelper::D_sub_faces(ch);
-
-        for (Simplex simplex : simplices) // for every D-sub-faces of Dcell (/ V-co-faces of the Vvertex)
+        
+        const std::list<Simplex> sub_faces = DelaunayHelper::D_sub_faces(ch);
+        for (Simplex simplex : sub_faces) // for every D-sub-faces of Dcell (/ V-co-faces of the Vvertex)
         {
             if (m_coboundary.count(simplex) == 0 // if that simplex is not already added
             && infinite_voronoi_face_duals.count(simplex) == 0) // if its dual is finite
@@ -149,8 +149,8 @@ void FiltrationVoronoi::compute_infinite_voronoi_face_duals()
     // run through every D-face of every Dcell incident to p_infinity (the infinite Dvertex).
     for (Delaunay::Cell_handle inf_Dcell : inf_Dcells)
     {
-        const std::list<Simplex> simplices = DelaunayHelper::D_sub_faces(inf_Dcell);
-        for (Simplex simplex : simplices)
+        const std::list<Simplex> sub_faces = DelaunayHelper::D_sub_faces(inf_Dcell);
+        for (Simplex simplex : sub_faces)
         {
             infinite_voronoi_face_duals.insert(simplex);
         }

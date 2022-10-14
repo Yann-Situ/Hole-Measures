@@ -122,8 +122,9 @@ void save_holes_criteria(std::vector<HoleMeas> holes, std::string filename,
             file << hole << std::endl;
     }
     file.close();
-    std::cout << "-- .tb file written, recall that each line contains: " << std::endl
-              << "dimension t_radius t_center[3] b_radius b_center[3]" << std::endl;
+    std::cout << "hole measures saved in "<< filename + extension
+    << ", recall that each line contains: " << std::endl
+    << "dimension t_radius t_center[3] b_radius b_center[3]" << std::endl;
 
 }
 
@@ -138,6 +139,7 @@ void save_holes_criteria(std::vector<HoleMeas> holes, std::string filename,
 void save_holes(std::vector<HoleMeas> holes, std::string filename,
     std::string extension)
 {
+    std::cout << "exhaustive ";
     save_holes_criteria(holes, filename,
         [](double t, double b) -> bool {return t > -b;},
         extension);
@@ -152,6 +154,7 @@ void save_holes(std::vector<HoleMeas> holes, std::string filename,
 void save_present_holes(std::vector<HoleMeas> holes, std::string filename,
     std::string extension)
 {
+    std::cout << "present ";
     save_holes_criteria(holes, filename,
         [](double t, double b) -> bool {return t > 0 && b > 0;},
         extension);

@@ -1,18 +1,34 @@
+#include "input_parser.h"
 #include "filtration_medial.h"
 #include "persistence.h"
 
-#include <vector>
 #include <fstream>
 #include <limits>
 
-
+/* Input parser code found here:
+ * https://stackoverflow.com/questions/865668/parsing-command-line-arguments-in-c */
 
 int main(int argc, char* argv[])
 {
-    const char* filename = (argc > 1) ? argv[1] : "../data/eight.off";
-    std::string m_filename(filename);
-    m_filename.erase(m_filename.end()-4, m_filename.end()); // remove ".off"
+    InputParser input_parser(argc, argv);
 
+    if(input_parser.cmdOptionExists("--help") || input_parser.cmdOptionExists("-h")){
+        std::clog << "Usage: main_medial object.off [-I] [-O] [-E] [-o output_file] [-h]" << std::endl
+        << "Compute hole measures of the 3D object object.off using the medial "
+        << "axis filtration.\nBy default, store only the present hole measures "
+        << "(TB-balls for early-birth-late-death holes) in the object.medial.tb "
+        << "file using the following format: " << std::endl
+        << "dimension t_radius t_center.x t_center.y t_center.z b_radius "
+        << "b_center.x b_center.y b_center.z" << std::endl
+        << "-I, --in         : compute holes measures of the inner medial axis filtration." << std::endl
+        << "-O, --out        : compute holes measures of the outer medial axis filtration." << std::endl
+        << "-E, --exhaustive : store every hole measures (not only the present hole measures)." << std::endl
+        << "-o output_file   : write the hole measures in output_file." << std::endl
+        << "-h, --help       : display this message." << std::endl;
+        exit(EXIT_SUCCESS);
+    }
+
+    const char* filename = (argc > 1) ? argv[1] : "../data/eight.off";
     // open the mesh file and import into a Polyhedron
     Polyhedron poly;
     std::ifstream input(filename);
@@ -22,33 +38,35 @@ int main(int argc, char* argv[])
         exit(EXIT_FAILURE);
     }
 
+    std::string output_filename(filename);
+    const std::string& output_option = input_parser.getCmdOption("-o");
+    if (!output_option.empty()){
+        output_filename = output_option;
+    }
+    else{
+        output_filename.erase(output_filename.end()-4, output_filename.end()); // remove ".off" from filename
+        output_filename = output_filename + ".medial.tb";
+    }
+    int medial_filtration_type = 0; // 1 for outer, -1 for inner, 0 for combined
+    if(input_parser.cmdOptionExists("--in") || input_parser.cmdOptionExists("-I")){
+        medial_filtration_type = -1;
+    }
+    else if(input_parser.cmdOptionExists("--out") || input_parser.cmdOptionExists("-O")){
+        medial_filtration_type = 1;
+    }
+    bool save_exhaustive_holes = false;
+    if(input_parser.cmdOptionExists("--exhaustive") || input_parser.cmdOptionExists("-E")){
+        save_exhaustive_holes = true;
+    }
+
+    /* Now perform the method */
+
+    std::vector<HoleMeas> holes;
     FiltrationMedial F(poly);
     F.init_medial_info();
     F.init_simplex_faces();
 
-    if      (argc > 2 && std::string(argv[2]) == "-i")
-    {
-        std::clog << "Using Inner Medial Axis Filtration" << std::endl;
-        F.make_filter(MedialType::Inner);
-        F.compute_delaunay_coboundary();
-
-        Persistence<FiltrationMedial::Simplex> pers(F);
-        pers.run_persistence();
-        pers.compute_holes_from_pairs();
-        save_present_holes(pers.get_holes(), m_filename, ".medial.tb");
-    }
-    else if (argc > 2 && std::string(argv[2]) == "-o")
-    {
-        std::clog << "Using Outer Medial Axis Filtration" << std::endl;
-        F.make_filter(MedialType::Outer);
-        F.compute_delaunay_coboundary();
-
-        Persistence<FiltrationMedial::Simplex> pers(F);
-        pers.run_persistence();
-        pers.compute_holes_from_pairs();
-        save_present_holes(pers.get_holes(), m_filename, ".medial.tb");
-    }
-    else
+    if (medial_filtration_type == 0)
     {
         std::clog << "Using Inner and Outer Medial Axis Filtration combined" << std::endl;
 
@@ -74,7 +92,6 @@ int main(int argc, char* argv[])
         std::clog << "- Hole Deduction:" << std::endl;
         std::vector<HoleMeas> holes_in = pers_in.get_holes();
         std::vector<HoleMeas> holes_out = pers_out.get_holes();
-        std::vector<HoleMeas> holes;
         alexander_deduction(holes_out);
         tb_pairing(holes_in, holes_out, holes);
 
@@ -83,8 +100,31 @@ int main(int argc, char* argv[])
         const TBball T(-F.get_filtration(0), F.get_point(0));
         const TBball B(inf, Point(inf,inf,inf));
         holes.push_back(HoleMeas(T,B,0));
+    }
+    else
+    {
 
-        save_present_holes(holes, m_filename, ".medial.tb");
+            if (medial_filtration_type == -1)
+            {
+                std::clog << "Using Inner Medial Axis Filtration" << std::endl;
+                F.make_filter(MedialType::Inner);
+            }
+            else //(medial_filtration_type == 1)
+            {
+                std::clog << "Using Outer Medial Axis Filtration" << std::endl;
+                F.make_filter(MedialType::Outer);
+            }
+            F.compute_delaunay_coboundary();
+            Persistence<FiltrationMedial::Simplex> pers(F);
+            pers.run_persistence();
+            pers.compute_holes_from_pairs();
+            holes = pers.get_holes();
+    }
+    if (save_exhaustive_holes){
+        save_holes(holes, output_filename, "");
+    }
+    else {
+        save_present_holes(holes, output_filename, "");
     }
 
     return 0;

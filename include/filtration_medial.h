@@ -81,7 +81,7 @@ private:
     std::map<Simplex, MedialInfo> medial_info; /// map simplex -> medial information
 
     std::map<Simplex, std::pair<Simplices, Simplices>> simplex_faces; // Dfaces and Dcofaces
-    std::map<Delaunay::Simplex, Simplex> simplex_convert; /// map simplex -> medial information
+    std::map<Delaunay::Simplex, Simplex> simplex_convert; 
     // std::map doesn't work with cell_handle / vertex_handle... that's a pity...
 };
 
