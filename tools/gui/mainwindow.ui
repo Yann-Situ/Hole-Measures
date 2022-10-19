@@ -97,6 +97,12 @@
          <property name="mouseTracking">
           <bool>false</bool>
          </property>
+         <property name="editable">
+          <bool>false</bool>
+         </property>
+         <property name="currentIndex">
+          <number>2</number>
+         </property>
          <item>
           <property name="text">
            <string>Thickness</string>
@@ -131,6 +137,9 @@
          </property>
          <property name="text">
           <string>all balls</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
@@ -186,6 +195,37 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QLabel" name="label_minimal_persistence">
+           <property name="text">
+            <string>Minimal persistence:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="spinbox_min_persistence">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="decimals">
+            <number>5</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QSlider" name="slider_min_persistence">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="ChartView" name="chartView_diagram">

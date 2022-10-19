@@ -152,6 +152,7 @@ void ChartView::handleClickedPoint(const QPointF &point)
 
 qreal ChartView::dist(const QPointF &p1, const QPointF &p2) const
 {
-    return qSqrt((p1.x() - p2.x()) * (p1.x() - p2.x())
+    return /*qSqrt*/((p1.x() - p2.x()) * (p1.x() - p2.x())
                  + (p1.y() - p2.y()) * (p1.y() - p2.y()));
+     // no nedd to use sqrt because we are only comparing distances.
 }

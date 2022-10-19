@@ -9,6 +9,8 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     m_thickness(false),
+    max_persistence(0.0),
+    current_min_persistence(0.0),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -61,6 +63,7 @@ void MainWindow::on_spinBox_hole_valueChanged(int i)
         ui->checkBox_dim1->setCheckState(Qt::Checked);
     else if (dim==2)
         ui->checkBox_dim2->setCheckState(Qt::Checked);
+    ui->spinbox_min_persistence->setValue(m_tb_balls.at(i).persistence*0.999);
     display_balls();
 }
 
@@ -78,6 +81,39 @@ void MainWindow::on_checkBox_dim2_stateChanged()
 {
     display_balls();
 }
+
+void MainWindow::on_slider_min_persistence_sliderMoved()
+{
+    const int v = ui->slider_min_persistence->value();
+    const int mini = ui->slider_min_persistence->minimum();
+    const int maxi = ui->slider_min_persistence->maximum();
+    const float range = (maxi-mini);
+    if (range <= 0.0)
+        current_min_persistence = 0.0;
+    else
+        current_min_persistence = (max_persistence*(v-mini))/(maxi-mini);
+    ui->spinbox_min_persistence->blockSignals(True);
+    ui->spinbox_min_persistence->setValue(current_min_persistence);
+    ui->spinbox_min_persistence->blockSignals(False);
+    display_balls();
+}
+
+void MainWindow::on_spinbox_min_persistence_valueChanged()
+{
+    const int mini = ui->slider_min_persistence->minimum();
+    const int maxi = ui->slider_min_persistence->maximum();
+    const double v = ui->spinbox_min_persistence->value();
+    if (v <= 0.0)
+        current_min_persistence = 0.0;
+    else if (v >= max_persistence)
+        current_min_persistence = max_persistence;
+    else
+        current_min_persistence = v;
+
+    ui->slider_min_persistence->setValue(int(1.0*current_min_persistence/max_persistence * (maxi-mini) + mini));
+    display_balls();
+}
+
 /**
  * @brief MainWindow::read_mesh
  * Load a mesh file and display it
@@ -127,16 +163,21 @@ void MainWindow::read_tb()
     }
     std::string line;
     m_tb_balls.clear();
+    max_persistence = 0.0;
     while (getline(file, line))
     {
         TBball ball;
         std::istringstream iss(line);
+        qDebug() << QString::fromStdString(line);
         iss >> ball.dim;
         iss >> ball.t_radius;
         iss >> ball.t_x >> ball.t_y >> ball.t_z;
         iss >> ball.b_radius;
         iss >> ball.b_x >> ball.b_y >> ball.b_z;
+        ball.persistence = ball.t_radius + ball.b_radius;
         m_tb_balls.push_back(ball);
+        max_persistence = (ball.persistence > max_persistence) ? ball.persistence : max_persistence;
+        qDebug() << ball.t_radius << " " << ball.b_radius;
     }
     file.close();
 
@@ -152,6 +193,12 @@ void MainWindow::read_tb()
     ui->checkBox_dim1->setEnabled(true);
     ui->checkBox_dim2->setEnabled(true);
 
+    ui->slider_min_persistence->setEnabled(true);
+    ui->spinbox_min_persistence->setEnabled(true);
+    ui->spinbox_min_persistence->setValue(current_min_persistence);
+    ui->spinbox_min_persistence->setMinimum(0.0);
+    ui->spinbox_min_persistence->setMaximum(max_persistence);
+    ui->spinbox_min_persistence->setSingleStep(max_persistence/100.0);
 
     display_balls();
     print_tb_pairs();
@@ -178,6 +225,9 @@ void MainWindow::show_tb_balls(const std::vector<TBball>& balls)
         if ((ball.dim==0 && !ui->checkBox_dim0->isChecked()) ||
             (ball.dim==1 && !ui->checkBox_dim1->isChecked()) ||
             (ball.dim==2 && !ui->checkBox_dim2->isChecked()) )
+            continue;
+
+        if (ball.persistence < current_min_persistence)
             continue;
 
         if (ui->comboBox_TBchoice->currentIndex() == 0 || ui->comboBox_TBchoice->currentIndex() == 2)

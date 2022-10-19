@@ -40,6 +40,9 @@ typedef struct {
     float t_x, t_y, t_z;    /// center of the T ball
     float b_radius;         /// radius of the breadth ball
     float b_x, b_y, b_z;    /// center of the B ball
+    float persistence;    /// t_radius + b_radius
+    //bool infinite_t;
+    //bool infinite_b;
 } TBball;
 
 /**
@@ -72,6 +75,9 @@ private slots:
     void on_checkBox_dim1_stateChanged();
     void on_checkBox_dim2_stateChanged();
 
+    void on_slider_min_persistence_sliderMoved();
+    void on_spinbox_min_persistence_valueChanged();
+    //void update_min_persistence(double value);
 public slots:
     void read_mesh();
     void read_tb();
@@ -87,6 +93,8 @@ private:
     std::vector<TBball> m_tb_balls;
     std::vector<bool> m_displayed_balls;
     bool m_thickness; // show thickness ball (breadth, otherwise)
+    float max_persistence;
+    float current_min_persistence;
 
     QString m_filebasename; // basename of the filename of the mesh
 
