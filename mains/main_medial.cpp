@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
     InputParser input_parser(argc, argv);
 
     if(input_parser.cmdOptionExists("--help") || input_parser.cmdOptionExists("-h")){
-        std::clog << "Usage: main_medial object.off [-I] [-O] [-E] [-o output_file] [-h]" << std::endl
+        std::clog << "Usage: main_medial object.off [-I] [-O] [-E] [-c] [-o output_file] [-h]" << std::endl
         << "Compute hole measures of the 3D object object.off using the medial "
         << "axis filtration.\nBy default, store only the present hole measures "
         << "(TB-balls for early-birth-late-death holes) in the object.medial.tb "
@@ -23,6 +23,7 @@ int main(int argc, char* argv[])
         << "-I, --in         : compute holes measures of the inner medial axis filtration." << std::endl
         << "-O, --out        : compute holes measures of the outer medial axis filtration." << std::endl
         << "-E, --exhaustive : store every hole measures (not only the present hole measures)." << std::endl
+        << "-c, --critical   : try to add topologically critical points to the filtration (WIP)." << std::endl
         << "-o output_file   : write the hole measures in output_file." << std::endl
         << "-h, --help       : display this message." << std::endl;
         exit(EXIT_SUCCESS);
@@ -58,6 +59,10 @@ int main(int argc, char* argv[])
     if(input_parser.cmdOptionExists("--exhaustive") || input_parser.cmdOptionExists("-E")){
         save_exhaustive_holes = true;
     }
+    bool add_critical = false;
+    if(input_parser.cmdOptionExists("--critical") || input_parser.cmdOptionExists("-c")){
+        add_critical = true;
+    }
 
     /* Now perform the method */
 
@@ -71,6 +76,7 @@ int main(int argc, char* argv[])
         std::clog << "Using Inner and Outer Medial Axis Filtration combined" << std::endl;
 
         std::clog << "- Outer Filtration:" << std::endl;
+        if (add_critical){F.add_critical_to_filter(MedialType::Outer);}
         F.make_filter(MedialType::Outer);
         F.compute_delaunay_coboundary();
         Persistence<FiltrationMedial::Simplex> pers_out(F);
@@ -82,6 +88,7 @@ int main(int argc, char* argv[])
          * the first 0-hole easily at the end of the computations:
          */
         std::clog << "- Inner Filtration:" << std::endl;
+        if (add_critical){F.add_critical_to_filter(MedialType::Inner);}
         F.make_filter(MedialType::Inner);
         F.compute_delaunay_coboundary();
         Persistence<FiltrationMedial::Simplex> pers_in(F);
@@ -103,22 +110,25 @@ int main(int argc, char* argv[])
     }
     else
     {
+        MedialType medial_type = MedialType::Boundary;
+        if (medial_filtration_type == -1)
+        {
+            std::clog << "Using Inner Medial Axis Filtration" << std::endl;
+            medial_type = MedialType::Inner;
+        }
+        else //(medial_filtration_type == 1)
+        {
+            std::clog << "Using Outer Medial Axis Filtration" << std::endl;
+            medial_type = MedialType::Outer;
+        }
 
-            if (medial_filtration_type == -1)
-            {
-                std::clog << "Using Inner Medial Axis Filtration" << std::endl;
-                F.make_filter(MedialType::Inner);
-            }
-            else //(medial_filtration_type == 1)
-            {
-                std::clog << "Using Outer Medial Axis Filtration" << std::endl;
-                F.make_filter(MedialType::Outer);
-            }
-            F.compute_delaunay_coboundary();
-            Persistence<FiltrationMedial::Simplex> pers(F);
-            pers.run_persistence();
-            pers.compute_holes_from_pairs();
-            holes = pers.get_holes();
+        if (add_critical){F.add_critical_to_filter(medial_type);}
+        F.make_filter(medial_type);
+        F.compute_delaunay_coboundary();
+        Persistence<FiltrationMedial::Simplex> pers(F);
+        pers.run_persistence();
+        pers.compute_holes_from_pairs();
+        holes = pers.get_holes();
     }
     if (save_exhaustive_holes){
         save_holes(holes, output_filename, "");

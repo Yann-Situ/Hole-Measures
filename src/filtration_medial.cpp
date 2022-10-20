@@ -222,11 +222,7 @@ void FiltrationMedial::add_critical_to_filter(MedialType med_type)
             std::cerr << "add_critical_to_filter error : medial_info simplex not find" << '\n';
             continue;
         }
-
-        if (it_med->second.m != med_type)
-        {
-            continue;
-        }
+        if (it_med->second.m != med_type){continue;}
 
         const Simplex& simp = it_med->first;
         const CriticalInfo crit =
@@ -241,15 +237,18 @@ void FiltrationMedial::add_critical_to_filter(MedialType med_type)
         if (crit.c == CriticalType::Critical)
         {
             critcount++;
-            // Easiest case, where we don't need to add new simplices:
             MedialInfo& medinfsimp = medial_info[simp];
             MedialInfo medinfcrit(med_type, crit.r, crit.p);
-            if (crit.r < medinfsimp.r)
+            if (crit.r <= medinfsimp.r)
             {
+                /* Easiest case, where we don't need to add new simplices:
+                 * we just need to delay the critical cell.
+                 */
                 /* in the filtration, simp arrives later than the max
-                 * filtration value of its Voronoi faces. It te case for
-                 * df local max (e.g breadth point of 0-hole and thickness
-                 * point of 2-hole).
+                 * filtration value of its Voronoi faces. It's the case for
+                 * df local min (e.g breadth point of 0-hole, thickness
+                 * point of 2-hole, T and B point of 1-hole).
+
                  * @conjecture the bad cases, where the Voronoi
                  * vertices doesn't approximate topologically critical points,
                  * are exactly the cases where the topologically critical point
@@ -263,59 +262,62 @@ void FiltrationMedial::add_critical_to_filter(MedialType med_type)
             }
             else
             {
-                // the cell arrives before in the filtration than the max filtration value of its Voronoi faces
-
+                /* the cell arrives before in the filtration than the max
+                 * filtration value of its Voronoi faces */
             }
-
-            // if (simp.dimension() == 1) // voronoi facet
-            // {
-            //
-            //
-            //     const Delaunay::Edge e(simp); // 2-hole : Voronoi facet
-            //     const Delaunay::Point p0 = m_dela.point(e.first->vertex(e.second));
-            //     const Delaunay::Point p1 = m_dela.point(e.first->vertex(e.third ));
-            // }
-            // else if (simp.dimension() == 2) // voronoi edge
-            // {
-            //     assert(simplex_faces[simp].second.size() == 2);
-            //     // the two 3Dsimplex (Voronoi vertices) of the Voronoi boundary
-            //     Simplex& p0 = simplex_faces[simp].second[0];
-            //     Simplex& p1 = simplex_faces[simp].second[1];
-            //     MedialInfo& medinfp0 = medial_info[p0];
-            //     MedialInfo& medinfp1 = medial_info[p1];
-            //
-            //     Simplex p(3); MedialInfo medinfp(med_type, crit.r, crit.p);
-            //     // new Dsimplex with dimension 3
-            //     medial_info[p] = medinfp;
-            //
-            //     Simplex e0(2);
-            //     // take the minimum radius:
-            //     medial_info[e0] = (medinfp0.r > medinfp.r) ? medinfp : medinfp0;
-            //
-            //     Simplex e1(2);
-            //     // take the minimum radius:
-            //     medial_info[e1] = (medinfp1.r > medinfp.r) ? medinfp : medinfp1;
-            //
-            //     simplex_faces[p] = std::make_pair(Simplices{e0,e1},Simplices()); // Dfaces / Dcofaces
-            //     simplex_faces[e0] = std::make_pair(Simplices(),Simplices()); // Dfaces / Dcofaces
-            //     simplex_faces[e1] = std::make_pair(Simplices(),Simplices()); // Dfaces / Dcofaces
-            //     for (Simplex Dface : simplex_faces[simp].first) // faces
-            //     {
-            //         std::pair<Simplices, Simplices>& Dface_pair = simplex_faces[Dface];
-            //         Dface_find.second.erase(simp); // erase from Dface cofaces
-            //         Dface_find.second.insert(e0);
-            //         Dface_find.second.insert(e1); // update medial info: take the min ?
-            //     }
-            //     for (Simplex Dcoface : simplex_faces[simp].second) // cofaces
-            //     {
-            //         std::pair<Simplices, Simplices>& Dcoface_pair = simplex_faces[Dface];
-            //         Dcoface_find.first.erase(simp); // erase from Dcoface faces
-            //     }
-            //
-            // }
-            // simplex_faces.erase(simp);
-            // medial_info.erase(it_med);
         }
     }
     std::clog << addcount << " adds and " << critcount << " crits" << '\n';
 }
+
+/* Some code I tried to implement to add simplices to the filtration/triangulation
+ * in order to handle topologically critical points.
+if (simp.dimension() == 1) // voronoi facet
+{
+
+
+    const Delaunay::Edge e(simp); // 2-hole : Voronoi facet
+    const Delaunay::Point p0 = m_dela.point(e.first->vertex(e.second));
+    const Delaunay::Point p1 = m_dela.point(e.first->vertex(e.third ));
+}
+else if (simp.dimension() == 2) // voronoi edge
+{
+    assert(simplex_faces[simp].second.size() == 2);
+    // the two 3Dsimplex (Voronoi vertices) of the Voronoi boundary
+    Simplex& p0 = simplex_faces[simp].second[0];
+    Simplex& p1 = simplex_faces[simp].second[1];
+    MedialInfo& medinfp0 = medial_info[p0];
+    MedialInfo& medinfp1 = medial_info[p1];
+
+    Simplex p(3); MedialInfo medinfp(med_type, crit.r, crit.p);
+    // new Dsimplex with dimension 3
+    medial_info[p] = medinfp;
+
+    Simplex e0(2);
+    // take the minimum radius:
+    medial_info[e0] = (medinfp0.r > medinfp.r) ? medinfp : medinfp0;
+
+    Simplex e1(2);
+    // take the minimum radius:
+    medial_info[e1] = (medinfp1.r > medinfp.r) ? medinfp : medinfp1;
+
+    simplex_faces[p] = std::make_pair(Simplices{e0,e1},Simplices()); // Dfaces / Dcofaces
+    simplex_faces[e0] = std::make_pair(Simplices(),Simplices()); // Dfaces / Dcofaces
+    simplex_faces[e1] = std::make_pair(Simplices(),Simplices()); // Dfaces / Dcofaces
+    for (Simplex Dface : simplex_faces[simp].first) // faces
+    {
+        std::pair<Simplices, Simplices>& Dface_pair = simplex_faces[Dface];
+        Dface_find.second.erase(simp); // erase from Dface cofaces
+        Dface_find.second.insert(e0);
+        Dface_find.second.insert(e1); // update medial info: take the min ?
+    }
+    for (Simplex Dcoface : simplex_faces[simp].second) // cofaces
+    {
+        std::pair<Simplices, Simplices>& Dcoface_pair = simplex_faces[Dface];
+        Dcoface_find.first.erase(simp); // erase from Dcoface faces
+    }
+
+}
+simplex_faces.erase(simp);
+medial_info.erase(it_med);
+*/

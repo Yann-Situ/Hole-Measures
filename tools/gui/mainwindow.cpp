@@ -82,7 +82,7 @@ void MainWindow::on_checkBox_dim2_stateChanged()
     display_balls();
 }
 
-void MainWindow::on_slider_min_persistence_sliderMoved()
+void MainWindow::on_slider_min_persistence_valueChanged()
 {
     const int v = ui->slider_min_persistence->value();
     const int mini = ui->slider_min_persistence->minimum();
@@ -110,7 +110,9 @@ void MainWindow::on_spinbox_min_persistence_valueChanged()
     else
         current_min_persistence = v;
 
+    ui->slider_min_persistence->blockSignals(True);
     ui->slider_min_persistence->setValue(int(1.0*current_min_persistence/max_persistence * (maxi-mini) + mini));
+    ui->slider_min_persistence->blockSignals(False);
     display_balls();
 }
 

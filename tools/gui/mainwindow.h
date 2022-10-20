@@ -75,7 +75,7 @@ private slots:
     void on_checkBox_dim1_stateChanged();
     void on_checkBox_dim2_stateChanged();
 
-    void on_slider_min_persistence_sliderMoved();
+    void on_slider_min_persistence_valueChanged();
     void on_spinbox_min_persistence_valueChanged();
     //void update_min_persistence(double value);
 public slots:
