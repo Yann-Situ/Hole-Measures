@@ -26,9 +26,9 @@ FiltrationMedial::FiltrationMedial(Polyhedron poly)
     }
     std::clog << "Computing persistence using Medial axes filtration" << std::endl;
     std::clog << "nb finite vertices: " << m_dela.number_of_vertices() << std::endl;
-    std::clog << "nb edges   : " << m_dela.number_of_edges() << " | finite: " << m_dela.number_of_finite_edges() << std::endl;
+    std::clog << "nb edges   : " << m_dela.number_of_edges()  << " | finite: " << m_dela.number_of_finite_edges() << std::endl;
     std::clog << "nb facets  : " << m_dela.number_of_facets() << " | finite: " << m_dela.number_of_finite_facets()<< std::endl;
-    std::clog << "nb cells   : " << m_dela.number_of_cells() << " | finite: " << m_dela.number_of_finite_cells()<< std::endl;
+    std::clog << "nb cells   : " << m_dela.number_of_cells()  << " | finite: " << m_dela.number_of_finite_cells()<< std::endl;
     // CGAL::draw(m_dela);
 }
 
@@ -267,7 +267,7 @@ void FiltrationMedial::add_critical_to_filter(MedialType med_type)
             }
         }
     }
-    std::clog << addcount << " adds and " << critcount << " crits" << '\n';
+    std::clog << "-- " << addcount << " adds and " << critcount << " crits" << '\n';
 }
 
 /* Some code I tried to implement to add simplices to the filtration/triangulation
