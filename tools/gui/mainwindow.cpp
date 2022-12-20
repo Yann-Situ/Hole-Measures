@@ -43,19 +43,15 @@ void MainWindow::on_checkBox_wireframe_stateChanged()
     displayMesh(&mesh);
 }
 
-void MainWindow::on_comboBox_TBchoice_currentIndexChanged()
-{
-    display_balls();
-}
-
-void MainWindow::on_checkBox_allballs_stateChanged()
-{
-    display_balls();
-}
+void MainWindow::on_comboBox_TBchoice_currentIndexChanged(){display_balls();}
+void MainWindow::on_checkBox_allballs_stateChanged(){display_balls();}
+void MainWindow::on_checkBox_presentholes_stateChanged(){display_balls();}
 
 void MainWindow::on_spinBox_hole_valueChanged(int i)
 {
     ui->checkBox_allballs->setCheckState(Qt::Unchecked);
+    if (!m_tb_balls.at(i).present_hole)
+        ui->checkBox_presentholes->setCheckState(Qt::Unchecked);
     int dim = m_tb_balls.at(i).dim;
     if (dim==0)
         ui->checkBox_dim0->setCheckState(Qt::Checked);
@@ -63,24 +59,15 @@ void MainWindow::on_spinBox_hole_valueChanged(int i)
         ui->checkBox_dim1->setCheckState(Qt::Checked);
     else if (dim==2)
         ui->checkBox_dim2->setCheckState(Qt::Checked);
-    ui->spinbox_min_persistence->setValue(m_tb_balls.at(i).persistence*0.999);
+    ui->spinbox_min_persistence->setValue(m_tb_balls.at(i).persistence - ui->spinbox_min_persistence->singleStep());
+    // we substract by singleStep because of a hidden floor function that results in not showing the balls.
     display_balls();
 }
 
-void MainWindow::on_checkBox_dim0_stateChanged()
-{
-    display_balls();
-}
+void MainWindow::on_checkBox_dim0_stateChanged(){display_balls();}
+void MainWindow::on_checkBox_dim1_stateChanged(){display_balls();}
+void MainWindow::on_checkBox_dim2_stateChanged(){display_balls();}
 
-void MainWindow::on_checkBox_dim1_stateChanged()
-{
-    display_balls();
-}
-
-void MainWindow::on_checkBox_dim2_stateChanged()
-{
-    display_balls();
-}
 
 void MainWindow::on_slider_min_persistence_valueChanged()
 {
@@ -176,6 +163,7 @@ void MainWindow::read_tb()
         iss >> ball.t_x >> ball.t_y >> ball.t_z;
         iss >> ball.b_radius;
         iss >> ball.b_x >> ball.b_y >> ball.b_z;
+        ball.present_hole = (ball.b_radius >= 0.0) && (ball.t_radius >= 0.0);
         ball.persistence = ball.t_radius + ball.b_radius;
         m_tb_balls.push_back(ball);
         max_persistence = (ball.persistence > max_persistence) ? ball.persistence : max_persistence;
@@ -191,6 +179,7 @@ void MainWindow::read_tb()
     ui->spinBox_hole->setMaximum(m_tb_balls.size()-1);
     ui->spinBox_hole->setEnabled(true);
     ui->checkBox_allballs->setEnabled(true);
+    ui->checkBox_presentholes->setEnabled(true);
     ui->checkBox_dim0->setEnabled(true);
     ui->checkBox_dim1->setEnabled(true);
     ui->checkBox_dim2->setEnabled(true);
@@ -200,7 +189,7 @@ void MainWindow::read_tb()
     ui->spinbox_min_persistence->setValue(current_min_persistence);
     ui->spinbox_min_persistence->setMinimum(0.0);
     ui->spinbox_min_persistence->setMaximum(max_persistence);
-    ui->spinbox_min_persistence->setSingleStep(max_persistence/100.0);
+    ui->spinbox_min_persistence->setSingleStep(max_persistence/1000.0);
 
     display_balls();
     print_tb_pairs();
@@ -224,6 +213,9 @@ void MainWindow::show_tb_balls(const std::vector<TBball>& balls)
     ui->text_HoleInfo->clear();
     for (size_t k = 0; k < balls.size(); k++) {
         const TBball& ball = balls.at(k);
+        if (ui->checkBox_presentholes->isChecked() && !ball.present_hole)
+            continue;
+
         if ((ball.dim==0 && !ui->checkBox_dim0->isChecked()) ||
             (ball.dim==1 && !ui->checkBox_dim1->isChecked()) ||
             (ball.dim==2 && !ui->checkBox_dim2->isChecked()) )

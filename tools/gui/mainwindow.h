@@ -41,6 +41,7 @@ typedef struct {
     float b_radius;         /// radius of the breadth ball
     float b_x, b_y, b_z;    /// center of the B ball
     float persistence;    /// t_radius + b_radius
+    bool present_hole;
     //bool infinite_t;
     //bool infinite_b;
 } TBball;
@@ -69,6 +70,7 @@ private slots:
     void on_pushButton_test_clicked();
     void on_checkBox_wireframe_stateChanged();
     void on_checkBox_allballs_stateChanged();
+    void on_checkBox_presentholes_stateChanged();
     void on_comboBox_TBchoice_currentIndexChanged();
     void on_spinBox_hole_valueChanged(int i);
     void on_checkBox_dim0_stateChanged();
