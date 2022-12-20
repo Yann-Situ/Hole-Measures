@@ -1,7 +1,6 @@
-# Yann-topo
+# Hole-Measures
+Software for computing the thickness-breadth balls of topological holes from a 3D volumetric object represented by polygonal mesh of its surface.
 -----------------
-
-Software for computing the thickness-breadth balls from a 3D volumetric object represented by polygonal mesh of its surface.
 
 ## Requirement
 This project requires the [CGAL](https://www.cgal.org/) library with Boost and QT5. The library [PHAT](https://github.com/blazs/phat) is already in the repository (`include/phat/`). The project also requires Cmake with version above 2.8.10.
