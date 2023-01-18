@@ -11,7 +11,7 @@ int main(int argc, char* argv[])
 {
     InputParser input_parser(argc, argv);
 
-    if(input_parser.cmdOptionExists("--help") || input_parser.cmdOptionExists("-h")){
+    if(input_parser.cmdOptionExists("--help") || input_parser.cmdOptionExists("-h") || argc <= 1){
         std::clog << "Usage: main_voronoi object.off [-E] [-o output_file] [-h]" << std::endl
         << "Compute hole measures of the 3D object object.off using the voronoi "
         << " filtration.\nBy default, store only the present hole measures "
@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
         exit(EXIT_SUCCESS);
     }
 
-    const char* filename = (argc > 1) ? argv[1] : "../data/eight.off";
+    const char* filename = argv[1];
     // open the mesh file and import into a Polyhedron
     Polyhedron poly;
     std::ifstream input(filename);

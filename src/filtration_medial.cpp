@@ -206,7 +206,7 @@ void FiltrationMedial::compute_delaunay_coboundary()
  * @note Should be called before make_filter().
  */
 
-/* not working yet, because we cannot create Delaunay::simplices that are not
+/* not done yet, because we cannot create Delaunay::simplices that are not
  * part of the delaunay triangulation... That's harder that it seems.
  */
 void FiltrationMedial::add_critical_to_filter(MedialType med_type)
@@ -244,18 +244,21 @@ void FiltrationMedial::add_critical_to_filter(MedialType med_type)
                 /* Easiest case, where we don't need to add new simplices:
                  * we just need to delay the critical cell.
                  */
-                /* in the filtration, simp arrives later than the max
+                /* In the filtration, simp arrives later than the max
                  * filtration value of its Voronoi faces. It's the case for
                  * df local min (e.g breadth point of 0-hole, thickness
                  * point of 2-hole, T and B point of 1-hole).
 
-                 * @conjecture the bad cases, where the Voronoi
-                 * vertices doesn't approximate topologically critical points,
+                 * @conjecture: in 3D, the bad cases (when the Voronoi
+                 * vertices doesn't approximate topologically critical points)
                  * are exactly the cases where the topologically critical point
                  * is a local df_med saddle of index <= D-1 = 1
                  * (D = dim_medialaxes).
-                 * A consequence is that we only need to add the Delaunay
-                 * critical points that are df_med saddle point.
+                 *
+                 * To sum up, bad approximation cases are easy to handle for
+                 * meidal axis filtration (we only need to change the
+                 * medial_info of the critical simplex). In other cases,
+                 * refining the mesh will converge to the rights spot.
                  */
                 medinfsimp = medinfcrit;
                 addcount++;
@@ -263,15 +266,24 @@ void FiltrationMedial::add_critical_to_filter(MedialType med_type)
             else
             {
                 /* the cell arrives before in the filtration than the max
-                 * filtration value of its Voronoi faces */
+                 * filtration value of its Voronoi faces:
+                 * we need to create a subdivision of the current Voronoi
+                 * element to add its critical point.
+                 */
             }
         }
     }
     std::clog << "-- " << addcount << " adds and " << critcount << " crits" << '\n';
 }
 
+
+
 /* Some code I tried to implement to add simplices to the filtration/triangulation
  * in order to handle topologically critical points.
+
+ * not working yet, because we cannot create Delaunay::simplices that are not
+ * part of the delaunay triangulation... That's harder that it seems.
+
 if (simp.dimension() == 1) // voronoi facet
 {
 

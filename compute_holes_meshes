@@ -1,0 +1,94 @@
+#!/bin/bash
+# compute exhaustive holes of input .off meshes using medial and Voronoi
+# each file.off create a file.medial.tb and a file.voronoi.tb file
+usage()
+{
+    echo 'Usage: compute_holes_meshes "argument(s)" [-o dir] [-rm]'
+    echo ""
+    echo "Compute exhaustive holes of input .off meshes using medial and Voronoi filtration."
+    echo "Each file.off create a file.medial.tb and a file.voronoi.tb file"
+    echo ""
+    echo "-o dir : to move the computed files in the dir directory"
+    echo ""
+    echo "-h or --help Print this message"
+}
+
+
+if [ $# = 0 ]
+then
+	usage
+fi
+
+let "a=0"
+let "move=0"
+declare -a newfiles
+declare -a firstfiles
+
+
+while [ "$1" != "" ]; do
+    PARAM=`echo $1 | awk -F= '{print $1}'`
+    VALUE=`echo $1 | awk -F= '{print $2}'`
+    case $PARAM in
+        -h | --help)
+            usage
+            exit
+            ;;
+        -o)
+	    let "move=1"
+	    shift
+	    directory="$1"
+	    if [ ! -e "$directory" ]
+	    then
+		mkdir $directory
+	    fi
+            ;;
+	*)
+	    IFS='.' read -ra split <<< "$1" #in order to split $1 in an array with delimiter '.'
+	    if [ "${split[1]}" == "off" ]
+	    then
+		if [ -e "$1" ]
+		then
+            ./build/main_medial "$1" --exhaustive -o "${split[0]}.medial.tb"
+            echo -e "\e[92m$1 \e[39m processed using medial axes filtration."
+            ./build/main_voronoi "$1" --exhaustive -o "${split[0]}.voronoi.tb"
+            echo -e "\e[92m$1 \e[39m processed using Voronoi filtration."
+		    let "a=a+1"
+		    firstfiles+=("$1")
+		    newfiles+=("${split[0]}.medial.tb")
+		    newfiles+=("${split[0]}.voronoi.tb")
+		else
+		    echo -e "\e[31m--- $1 \e[39mdoesn't seems to exist..."
+		fi
+	    else
+		echo -e "\e[91m--- $1 \e[39mnot a .off file"
+	    fi
+            ;;
+    esac
+    shift
+done
+
+if [ $a -lt 2 ]
+then
+   echo -e "\e[39m$a files created."
+else
+   echo -e "\e[39m$a file created."
+fi
+
+#move step :
+if [ $move -eq 1 ]; then
+
+    echo""
+    #this doesn't work because of spaces in names
+    # for file in ${newfiles[*]}
+    # do
+    # 	mv "$file" "$directory"
+    # 	echo "$file moved"
+    # done
+    #instead use :
+    for ((i = 0; i < ${#newfiles[@]}; i++))
+    do
+	mv "${newfiles[$i]}" "$directory"
+	echo "${newfiles[$i]} moved"
+    done
+fi
+IFS=' '

@@ -111,9 +111,13 @@ bool DelaunayHelper::is_infinite(
 /**
  * @brief DelaunayHelper::get_critical_info
  * Return a CriticalInfo of the simplex.
- * Precisely, return a CriticalInfo(c,r,p) where c is the CriticalType of s.
- * if c is CriticalType::Critical, then p is the critical point of the cell and
- * r is its distance to border value.
+ *
+ * A Delaunay simplex is critical if it intersects its Voronoi dual. The
+ * potentially intersection is called the critical point.
+ *
+ * Precisely, the function returns a CriticalInfo(c,r,p) where c is the
+ * CriticalType of s. if c is CriticalType::Critical, then p is the critical
+ * point of the cell and r is its distance to border value.
  */
 CriticalInfo DelaunayHelper::get_critical_info(
     const Delaunay &m_dela,
@@ -122,9 +126,9 @@ CriticalInfo DelaunayHelper::get_critical_info(
     CriticalInfo crit(CriticalType::NonCritical);
     if (!DelaunayHelper::is_infinite(m_dela,s))
     {
-        if (s.dimension() == 1)
+        if (s.dimension() == 1) // 2-hole : Voronoi facet
         {
-            const Delaunay::Edge e(s); // 2-hole : Voronoi facet
+            const Delaunay::Edge e(s);
             if (m_dela.is_Gabriel(e))
             {
                 //std::clog << "2-hole critical" << std::endl;
@@ -137,11 +141,11 @@ CriticalInfo DelaunayHelper::get_critical_info(
                 );
             }
         }
-        else if (s.dimension() == 2)
+        else if (s.dimension() == 2)  // 1-hole : Voronoi edge
         {
-            // in this case we need to check if the triangle is gabriel and acute.
-            // this implies (conjecture) that it intersects its Voronoi dual
-            const Delaunay::Facet f(s); // 1-hole : Voronoi edge
+            // A delaunay triangle intersects its Voronoi edge iff it is
+            // Gabriel and acute. Hence we need to check those two properties.
+            const Delaunay::Facet f(s);
             if (m_dela.is_Gabriel(f))
             {
                 Delaunay::Cell_handle ch = f.first;
@@ -183,7 +187,7 @@ CriticalInfo DelaunayHelper::get_critical_info(
                 );
             }
         }
-        else if (s.dimension() == 0)
+        else if (s.dimension() == 0) // 3-hole : Voronoi cell
         {
             const Delaunay::Vertex_handle p(s);
             crit.assign(
