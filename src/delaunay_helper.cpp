@@ -4,6 +4,10 @@ DelaunayHelper
 
 #include "delaunay_helper.h"
 
+/**
+ * @brief DelaunayHelper::D_faces
+ * Return the list of the simplexe in the boundary of s.
+ */
 std::list<Delaunay::Simplex> DelaunayHelper::D_faces(const Delaunay::Simplex s)
 {
     std::list<Delaunay::Simplex> l;
@@ -35,7 +39,13 @@ std::list<Delaunay::Simplex> DelaunayHelper::D_faces(const Delaunay::Simplex s)
     return l;
 }
 
-
+/**
+ * @brief DelaunayHelper::D_sub_faces
+ * Return the list of every simplexe in the iterated boundary of a Delaunay object s.
+ * Precisely return $\partial^0(s)\cup\partial^1(s)\cup ... \cup\partial^n(s)\cup$
+ * where $\partial$ is the boundary operator.
+ * Note that the simplexe corresponding to s is also in the list.
+ */
 std::list<Delaunay::Simplex> DelaunayHelper::D_sub_faces(const Delaunay::Cell_handle ch)
 {
     std::list<Delaunay::Simplex> l;

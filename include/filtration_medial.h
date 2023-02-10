@@ -11,7 +11,7 @@
  */
 
 //enum class CellCritType {NonCritical, Critical}; // moved to delauney_helper.h
-enum class MedialType {Boundary, Inner, Outer};
+enum MedialType {Boundary=0, Inner=1, Outer=2};
 
 struct MedialInfo
 {
@@ -58,6 +58,7 @@ public:
     typedef MedialSimplex Simplex;
     typedef std::set<Simplex> Simplices;
     FiltrationMedial(Polyhedron poly);//const std::string &filename);
+    std::array<int,3> get_medial_count();
 
     void init_medial_info();
     void init_simplex_faces();
@@ -81,7 +82,8 @@ private:
     std::map<Simplex, MedialInfo> medial_info; /// map simplex -> medial information
 
     std::map<Simplex, std::pair<Simplices, Simplices>> simplex_faces; // Dfaces and Dcofaces
-    std::map<Delaunay::Simplex, Simplex> simplex_convert; 
+    std::map<Delaunay::Simplex, Simplex> simplex_convert;
+    std::vector<int> medialtype_count;
     // std::map doesn't work with cell_handle / vertex_handle... that's a pity...
 };
 

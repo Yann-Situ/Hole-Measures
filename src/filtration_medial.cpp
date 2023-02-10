@@ -49,6 +49,8 @@ void FiltrationMedial::init_medial_info()
     simplex_faces.clear();
     simplex_convert.clear();
     medial_info.clear();
+    medialtype_count.clear();
+
     // (which corresponds to Voronoi vertices)
     for (Delaunay::Cell_handle ch : m_dela.all_cell_handles())
     {
@@ -106,6 +108,24 @@ void FiltrationMedial::init_medial_info()
     std::clog << "-- medial_type and distance_field computed: " << simplex_faces.size() << " simplices" << std::endl;
 }
 
+/**
+ * @brief FiltrationMedial::get_medial_count
+ * Count the boundary, inner and outer medial axis size in terms of simplices.
+ */
+std::array<int,3> FiltrationMedial::get_medial_count()
+{
+    std::array<int, 3> count{ {0, 0, 0} };
+    for (const std::pair<Simplex, MedialInfo>& simp_med : medial_info)
+    {
+        count[simp_med.second.m] += 1;
+    }
+    return count;
+}
+
+/**
+ * @brief FiltrationMedial::init_simplex_faces
+ * Init the map simplex_faces, that contains the Delaunay faces and cofaces.
+ */
 void FiltrationMedial::init_simplex_faces()
 {
     for (const std::pair<Delaunay::Simplex, Simplex>& simp_pair : simplex_convert)
