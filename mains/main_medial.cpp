@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
     InputParser input_parser(argc, argv);
 
     if(input_parser.cmdOptionExists("--help") || input_parser.cmdOptionExists("-h") || argc <= 1){
-        std::clog << "Usage: main_medial object.off [-I] [-O] [-E] [-c] [-o output_file] [-h]" << std::endl
+        std::clog << "Usage: main_medial_axes object.off [-I] [-O] [-E] [-c] [-o output_file] [-h]" << std::endl
         << "Compute hole measures of the 3D object object.off using the medial "
         << "axis filtration.\nBy default, store only the present hole measures "
         << "(TB-balls for early-birth-late-death holes) in the object.medial.tb "

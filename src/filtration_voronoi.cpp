@@ -40,10 +40,10 @@ FiltrationVoronoi::FiltrationVoronoi(Polyhedron poly)
 //        std::cout << it->point() << std::endl;
     }
     std::clog << "Computing persistence using Voronoi filtration" << std::endl;
-    std::clog << "nb finite vertices: " << m_dela.number_of_vertices() << std::endl;
-    std::clog << "nb edges   : " << m_dela.number_of_edges() << " | finite: " << m_dela.number_of_finite_edges() << std::endl;
-    std::clog << "nb facets  : " << m_dela.number_of_facets() << " | finite: " << m_dela.number_of_finite_facets()<< std::endl;
-    std::clog << "nb cells   : " << m_dela.number_of_cells() << " | finite: " << m_dela.number_of_finite_cells()<< std::endl;
+    // std::clog << "nb finite vertices: " << m_dela.number_of_vertices() << std::endl;
+    // std::clog << "nb edges   : " << m_dela.number_of_edges() << " | finite: " << m_dela.number_of_finite_edges() << std::endl;
+    // std::clog << "nb facets  : " << m_dela.number_of_facets() << " | finite: " << m_dela.number_of_finite_facets()<< std::endl;
+    // std::clog << "nb cells   : " << m_dela.number_of_cells() << " | finite: " << m_dela.number_of_finite_cells()<< std::endl;
 
     // CGAL::draw(m_dela);
 }
@@ -107,7 +107,7 @@ void FiltrationVoronoi::make_filter()
     for (auto pair : pairs) // for every Dcell (in decreasing sdf order)
     {
         const Delaunay::Cell_handle ch = pair.second; // current Dcell
-        
+
         const std::list<Simplex> sub_faces = DelaunayHelper::D_sub_faces(ch);
         for (Simplex simplex : sub_faces) // for every D-sub-faces of Dcell (/ V-co-faces of the Vvertex)
         {

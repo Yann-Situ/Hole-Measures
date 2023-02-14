@@ -24,11 +24,11 @@ FiltrationMedial::FiltrationMedial(Polyhedron poly)
         m_dela.insert(it->point()); // m_dela corresponds to the 3D Delaunay of the surface points
 //        std::cout << it->point() << std::endl;
     }
-    std::clog << "Computing persistence using Medial axes filtration" << std::endl;
-    std::clog << "nb finite vertices: " << m_dela.number_of_vertices() << std::endl;
-    std::clog << "nb edges   : " << m_dela.number_of_edges()  << " | finite: " << m_dela.number_of_finite_edges() << std::endl;
-    std::clog << "nb facets  : " << m_dela.number_of_facets() << " | finite: " << m_dela.number_of_finite_facets()<< std::endl;
-    std::clog << "nb cells   : " << m_dela.number_of_cells()  << " | finite: " << m_dela.number_of_finite_cells()<< std::endl;
+    std::clog << "Computing persistence using medial axes filtration" << std::endl;
+    // std::clog << "nb finite vertices: " << m_dela.number_of_vertices() << std::endl;
+    // std::clog << "nb edges   : " << m_dela.number_of_edges()  << " | finite: " << m_dela.number_of_finite_edges() << std::endl;
+    // std::clog << "nb facets  : " << m_dela.number_of_facets() << " | finite: " << m_dela.number_of_finite_facets()<< std::endl;
+    // std::clog << "nb cells   : " << m_dela.number_of_cells()  << " | finite: " << m_dela.number_of_finite_cells()<< std::endl;
     // CGAL::draw(m_dela);
 }
 

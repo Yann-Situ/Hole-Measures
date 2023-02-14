@@ -84,27 +84,19 @@ include_directories( BEFORE ../include )
 
 # Creating entries for all C++ files with "main" routine
 # ##########################################################
-set(main_voronoi "main_voronoi")
+set(main_link "main_link")
 set(main_medial "main_medial")
-set(main_resampling "main_resampling")
-set(main_medial_count "main_medial_count")
-add_executable(main_voronoi "mains/main_voronoi.cpp")
+add_executable(main_link "mains/main_link.cpp")
 add_executable(main_medial "mains/main_medial.cpp")
-add_executable(main_resampling "mains/main_resampling.cpp")
-add_executable(main_medial_count "mains/main_medial_count.cpp")
 
 # [1]
 if(CGAL_Qt5_FOUND)
     # target_link_libraries(main PUBLIC CGAL::CGAL_Qt5)
     # target_link_libraries(main_resampling PUBLIC CGAL::CGAL_Qt5)
     #target_link_libraries(main ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
-    target_link_libraries(main_voronoi CGAL::CGAL CGAL::CGAL_Qt5)
+    target_link_libraries(main_link CGAL::CGAL CGAL::CGAL_Qt5)
     target_link_libraries(main_medial CGAL::CGAL CGAL::CGAL_Qt5)
-    target_link_libraries(main_resampling CGAL::CGAL CGAL::CGAL_Qt5)
-    target_link_libraries(main_medial_count CGAL::CGAL CGAL::CGAL_Qt5)
 
-    target_link_libraries(main_voronoi BaseFiles)
+    target_link_libraries(main_link BaseFiles)
     target_link_libraries(main_medial BaseFiles)
-    target_link_libraries(main_resampling BaseFiles)
-    target_link_libraries(main_medial_count BaseFiles)
 endif()
