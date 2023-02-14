@@ -21,9 +21,9 @@ Compute hole measures of the 3D object *object.off* using the Voronoi filtration
 By default, store only the present hole measures in the *object.link.tb* file using the *tb* format (see [Output section](#output)).
 
 Some parameters can be used:
-`-E`,` --exhaustive` : store every hole measures (not only the present hole measures).
-`-o output_file`     : write the hole measures in *output_file*.
-`-h`, `--help`       : display this message.
+- `-E`,` --exhaustive` : store every hole measures (not only the present hole measures).
+- `-o output_file`     : write the hole measures in *output_file*.
+- `-h`, `--help`       : display this message.
 
 ## Medial axes approach
 The `main_medial` executable corresponds to the *medial axes approach*. More precisely, it computes the hole-balls the inner and outer medial axis filtration. Note that it produces arbitrary *TB*-pairs that do not corresponds to the real ones.
@@ -33,12 +33,12 @@ Compute hole-balls of the 3D object *object.off* using the medial axes filtratio
 By default, store only the present hole measures in the *object.medial.tb* file using the *.tb* format (see [Output section](#output)).
 
 Some parameters can be used:
-`-I`, `--in`         : compute only holes measures of the inner medial axis filtration.
-`-O`, `--out`        : compute only holes measures of the outer medial axis filtration.
-`-E`, `--exhaustive` : store every hole measures (not only the present hole measures).
-`-c`, `--critical`   : take into account Delaunay critical points to correct wrong hole-balls.
-`-o output_file`     : write the hole measures in *output_file*.
-`-h`, `--help`       : display this message.
+- `-I`, `--in`         : compute only holes measures of the inner medial axis filtration.
+- `-O`, `--out`        : compute only holes measures of the outer medial axis filtration.
+- `-E`, `--exhaustive` : store every hole measures (not only the present hole measures).
+- `-c`, `--critical`   : take into account Delaunay critical points to correct wrong hole-balls.
+- `-o output_file`     : write the hole measures in *output_file*.
+- `-h`, `--help`       : display this message.
 
 ## Output
 A hole measure is a pair of two hole-balls (the *T*-ball and the *B*-ball) that can be associated to a topological hole of an volumetric object.
