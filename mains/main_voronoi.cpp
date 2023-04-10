@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
     // evaluation variables
     clock_t time_last = clock();
     double time_delaunay = 0.0, time_filter = 0.0, time_persistence = 0.0;
-    int filter_size = 0, hole_size = 0;
+    int filter_size = 0; //int hole_size = 0;
 
     std::vector<HoleMeas> holes;
     FiltrationVoronoi F(poly);
@@ -76,12 +76,12 @@ int main(int argc, char* argv[])
     time_persistence += (double)(clock() - time_last)/CLOCKS_PER_SEC;
 
     holes = pers.get_holes();
-    if (save_exhaustive_holes){
-        hole_size = save_holes(holes, output_filename, "");
-    }
-    else {
-        hole_size = save_present_holes(holes, output_filename, "");
-    }
+    // if (save_exhaustive_holes){
+    //     hole_size = save_holes(holes, output_filename, "");
+    // }
+    // else {
+    //     hole_size = save_present_holes(holes, output_filename, "");
+    // }
 
     std::cout << "## Voronoi: " << std::string(filename) << std::endl;
     std::cout.precision(6);
@@ -92,7 +92,7 @@ int main(int argc, char* argv[])
 
     std::cout   << "sampling size: " << poly.size_of_vertices() << std::endl;
     std::cout   << "filter size  : " << filter_size << std::endl;
-    std::cout   << "holes size   : " << hole_size << std::endl;
+    //std::cout   << "holes size   : " << hole_size << std::endl;
     std::cout   << std::endl;
 
     return 0;
