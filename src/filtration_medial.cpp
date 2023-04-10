@@ -32,11 +32,20 @@ FiltrationMedial::FiltrationMedial(Polyhedron poly)
     // CGAL::draw(m_dela);
 }
 
-
 /**
  * @brief FiltrationMedial::init_medial_info
  * Computes the maps medial_type and distance_field and points (ball centers).
  */
+ struct before_than_face_value_order
+ {
+     // to compare pairs of (medial_info, Dcell)
+     inline bool operator()
+         (const std::pair<MedialInfo, Delaunay::Cell_handle>& sd1,
+          const std::pair<MedialInfo, Delaunay::Cell_handle>& sd2)
+     {
+         return (sd1.first.r < sd2.first.r);
+     }
+ };
 void FiltrationMedial::init_medial_info()
 {
     // initialize the data structure for telling if a point is inside a mesh
@@ -46,12 +55,9 @@ void FiltrationMedial::init_medial_info()
     const double inf = std::numeric_limits<double>::infinity();
     const MedialInfo medinf_boundary{MedialType::Boundary, 0.0};
 
-    simplex_faces.clear();
-    simplex_convert.clear();
-    medial_info.clear();
-    medialtype_count.clear();
-
+    std::vector<std::pair<MedialInfo, Delaunay::Cell_handle>> pairs(m_dela.number_of_cells());
     // (which corresponds to Voronoi vertices)
+    int i = 0;
     for (Delaunay::Cell_handle ch : m_dela.all_cell_handles())
     {
         MedialInfo medinf; // firstly: assign medinf
@@ -70,7 +76,20 @@ void FiltrationMedial::init_medial_info()
                 MedialType::Inner : MedialType::Outer;
             medinf.assign(ch_type, radius, dual_point);
         }
+        pairs.at(i) = std::make_pair(medinf, ch);
+        i++;
+    }
+    std::sort(pairs.begin(), pairs.end(), before_than_face_value_order());
+    // farthest from the border must be last when (reverse order from the filtration)
+    simplex_faces.clear();
+    simplex_convert.clear();
+    medial_info.clear();
+    medialtype_count.clear();
 
+    for (auto pair : pairs) // for every Dcell (in decreasing sdf order)
+    {
+        const Delaunay::Cell_handle ch = pair.second; // current Dcell
+        MedialInfo medinf = pair.first;
         // secondly: run through D-sub-faces
         const std::list<Delaunay::Simplex> faces = DelaunayHelper::D_sub_faces(ch);
         for (Delaunay::Simplex face_D : faces)
@@ -87,17 +106,13 @@ void FiltrationMedial::init_medial_info()
             }
             else
             {
-                //face.assign(simplex_find->second);
+                /* WARNING :
+                 * pairs is in increasing df order because we want to add a
+                 * Delaunay cell at the same time as the boundary cell that
+                 * minimize df.
+                 * As a result we don't need to change the previous medinfo */
                 auto face_info_find = medial_info.find(simplex_find->second);
-                if (face_info_find->second.m == medinf.m)
-                {
-                    if (face_info_find->second.r > medinf.r)
-                    {
-                        // take the min radius (max filtration value)
-                        face_info_find->second = medinf;
-                    }
-                }
-                else
+                if (face_info_find->second.m != medinf.m)
                 {
                     // Delaunay face on the two sides
                     face_info_find->second = medinf_boundary;

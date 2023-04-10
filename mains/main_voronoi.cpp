@@ -88,7 +88,7 @@ int main(int argc, char* argv[])
     std::cout   << "del: " << std::fixed << time_delaunay    << "    "
                 << "fil: " << std::fixed << time_filter      << "    "
                 << "per: " << std::fixed << time_persistence << "    " << std::endl;
-    std::cout   << "tot: " << std::fixed << time_delaunay+time_filter+time_persistence << std::endl;
+    std::cout   << "tot: " << std::fixed << time_filter+time_persistence << std::endl;
 
     std::cout   << "sampling size: " << poly.size_of_vertices() << std::endl;
     std::cout   << "filter size  : " << filter_size << std::endl;

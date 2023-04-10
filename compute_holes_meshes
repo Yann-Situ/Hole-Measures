@@ -23,7 +23,7 @@ let "a=0"
 let "move=0"
 declare -a newfiles
 declare -a firstfiles
-evaluation_file="evaluation.txt"
+evaluation_file="evaluation_new.txt"
 touch $evaluation_file
 
 while [ "$1" != "" ]; do

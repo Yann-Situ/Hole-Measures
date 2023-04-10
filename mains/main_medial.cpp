@@ -171,7 +171,7 @@ int main(int argc, char* argv[])
                 << "fil: " << std::fixed << time_filter      << "    "
                 << "per: " << std::fixed << time_persistence << "    "
                 << "bis: " << std::fixed << time_filter_bis  << "    " << std::endl;
-    std::cout   << "tot: " << std::fixed << time_delaunay+time_filter+time_persistence << std::endl;
+    std::cout   << "tot: " << std::fixed << time_filter+time_persistence << std::endl;
 
     std::cout   << "sampling size: " << poly.size_of_vertices() << std::endl;
     std::cout   << "filter size  : " << filter_size << std::endl;
