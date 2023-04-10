@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
         hole_size = save_present_holes(holes, output_filename, "");
     }
 
-    std::cout << "# " << std::string(filename) << std::endl;
+    std::cout << "## Voronoi: " << std::string(filename) << std::endl;
     std::cout.precision(6);
     std::cout   << "del: " << std::fixed << time_delaunay    << "    "
                 << "fil: " << std::fixed << time_filter      << "    "
