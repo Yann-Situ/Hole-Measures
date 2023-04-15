@@ -83,17 +83,21 @@ int main(int argc, char* argv[])
     //     hole_size = save_present_holes(holes, output_filename, "");
     // }
 
-    std::cout << "## Voronoi: " << std::string(filename) << std::endl;
-    std::cout.precision(6);
-    std::cout   << "del: " << std::fixed << time_delaunay    << "    "
-                << "fil: " << std::fixed << time_filter      << "    "
-                << "per: " << std::fixed << time_persistence << "    " << std::endl;
-    std::cout   << "tot: " << std::fixed << time_filter+time_persistence << std::endl;
+    //std::cout << "## Voronoi: " << std::string(filename) << std::endl;
+    std::cout.precision(3);
+    // std::cout   //<< "del: " << std::fixed << time_delaunay    << "    "
+    //             << "fil: " << std::fixed << time_delaunay+time_filter      << "    "
+    //             << "per: " << std::fixed << time_persistence << "    " << std::endl;
+    // std::cout   << "tot: " << std::fixed << time_delaunay+time_filter+time_persistence << std::endl;
+    //
+    // std::cout   << "sampling size: " << poly.size_of_vertices() << std::endl;
+    // std::cout   << "filter size  : " << filter_size << std::endl;
+    // //std::cout   << "holes size   : " << hole_size << std::endl;
+    // std::cout   << std::endl;
 
-    std::cout   << "sampling size: " << poly.size_of_vertices() << std::endl;
-    std::cout   << "filter size  : " << filter_size << std::endl;
-    //std::cout   << "holes size   : " << hole_size << std::endl;
-    std::cout   << std::endl;
+    std::cout   << filter_size << " "
+                << std::fixed << time_delaunay+time_filter << " "
+                << std::fixed << time_persistence << std::endl;
 
     return 0;
 }

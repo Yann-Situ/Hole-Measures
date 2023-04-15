@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
     }
 
     FiltrationMedial F(poly);
-    F.init_medial_info();
+    F.init_finite_filtration_info();
     std::array<int, 3> count = F.get_medial_count();
     // int c_boundary = F.get_medial_count(MedialType::Boundary);
     // int c_inner = F.get_medial_count(MedialType::Inner);

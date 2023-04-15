@@ -69,17 +69,16 @@ int main(int argc, char* argv[])
 
     // evaluation variables
     clock_t time_last = clock();
-    double time_delaunay = 0.0, time_filter = 0.0, time_persistence = 0.0, time_filter_bis = 0.0;
-    int filter_size = 0; //int hole_size = 0;
+    double time_delaunay = 0.0, time_filter = 0.0, time_persistence = 0.0;
+    int filter_size = 0; int number_of_holes = 0;
 
     std::vector<HoleMeas> holes;
     FiltrationMedial F(poly);
     time_delaunay += (double)(clock() - time_last)/CLOCKS_PER_SEC;
 
     time_last = clock();
-    F.init_medial_info();
-    time_filter_bis += (double)(clock() - time_last)/CLOCKS_PER_SEC;
-    F.init_simplex_faces();
+    F.init_finite_filtration_info();
+    F.init_infinite_filtration_info();
 
     if (medial_filtration_type == 0)
     {
@@ -159,24 +158,30 @@ int main(int argc, char* argv[])
         holes = pers.get_holes();
     }
     // if (save_exhaustive_holes){
-    //     hole_size = save_holes(holes, output_filename, "");
+    //     number_of_holes = save_holes(holes, output_filename, "");
     // }
     // else {
-    //     hole_size = save_present_holes(holes, output_filename, "");
+    //     number_of_holes = save_present_holes(holes, output_filename, "");
     // }
 
-    std::cout << "## Medial : " << std::string(filename) << std::endl;
-    std::cout.precision(6);
-    std::cout   << "del: " << std::fixed << time_delaunay    << "    "
-                << "fil: " << std::fixed << time_filter      << "    "
-                << "per: " << std::fixed << time_persistence << "    "
-                << "bis: " << std::fixed << time_filter_bis  << "    " << std::endl;
-    std::cout   << "tot: " << std::fixed << time_filter+time_persistence << std::endl;
+    // std::cout << "## Medial : " << std::string(filename) << std::endl;
+    std::cout.precision(3);
+    // std::cout   //<< "del: " << std::fixed << time_delaunay    << "    "
+    //             << "fil: " << std::fixed << time_delaunay+time_filter  << "    "
+    //             << "per: " << std::fixed << time_persistence << "    "
+    //             << "bis: " << std::fixed << time_filter_bis  << "    " << std::endl;
+    // std::cout   << "tot: " << std::fixed << time_delaunay+time_filter+time_persistence << std::endl;
+    //
+    // std::cout   << "sampling size: " << poly.size_of_vertices() << std::endl;
+    // std::cout   << "filter size  : " << filter_size << std::endl;
+    // //std::cout   << "holes size   : " << number_of_holes << std::endl;
+    // std::cout   << std::endl;
 
-    std::cout   << "sampling size: " << poly.size_of_vertices() << std::endl;
-    std::cout   << "filter size  : " << filter_size << std::endl;
-    //std::cout   << "holes size   : " << hole_size << std::endl;
-    std::cout   << std::endl;
+    std::cout   << std::string(filename) << " "
+                << poly.size_of_vertices() << " "
+                << filter_size << " "
+                << std::fixed << time_delaunay+time_filter << " "
+                << std::fixed << time_persistence << " ";
 
     return 0;
 }

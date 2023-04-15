@@ -6,7 +6,7 @@ DelaunayHelper
 
 /**
  * @brief DelaunayHelper::D_faces
- * Return the list of the simplexe in the boundary of s.
+ * Return the list of the (d-1)-simplices in the boundary of the d-simplexe s.
  */
 std::list<Delaunay::Simplex> DelaunayHelper::D_faces(const Delaunay::Simplex s)
 {
@@ -82,6 +82,55 @@ std::list<Delaunay::Simplex> DelaunayHelper::D_sub_faces(const Delaunay::Facet f
     l.push_back(Delaunay::Simplex(f));
     return l;
 }
+
+/**
+ * @brief DelaunayHelper::D_finite_faces
+ * Return the list of the finite 2-simplices in the boundary of the D-cell ch.
+ */
+std::list<Delaunay::Simplex> DelaunayHelper::D_finite_faces(const Delaunay &m_dela, const Delaunay::Cell_handle ch)
+{
+    std::list<Delaunay::Simplex> l;
+    for (size_t i = 0; i < 4; i++) {
+        const Delaunay::Facet f_i = Delaunay::Facet(ch, i);
+        if (!m_dela.is_infinite(f_i))
+            l.push_back(Delaunay::Simplex(f_i));
+    }
+    return l;
+}
+
+/**
+ * @brief DelaunayHelper::D_finite_sub_faces
+ * Return the list of the finite 2-simplices in the boundary of the D-cell ch.
+ */
+std::list<Delaunay::Simplex> DelaunayHelper::D_finite_sub_faces(const Delaunay &m_dela, const Delaunay::Cell_handle ch)
+{
+    std::list<Delaunay::Simplex> l;
+    std::list<Delaunay::Edge> edges;
+    for (size_t i = 0; i < 4; i++) {
+        const Delaunay::Vertex_handle v_i = ch->vertex(i);
+        if (!m_dela.is_infinite(v_i))
+            l.push_back(Delaunay::Simplex(v_i));
+    }
+    edges.push_back(Delaunay::Edge(ch, 2, 3));
+    edges.push_back(Delaunay::Edge(ch, 1, 3));
+    edges.push_back(Delaunay::Edge(ch, 0, 3));
+    edges.push_back(Delaunay::Edge(ch, 1, 2));
+    edges.push_back(Delaunay::Edge(ch, 0, 2));
+    edges.push_back(Delaunay::Edge(ch, 0, 1));
+    for (Delaunay::Edge e_i: edges) {
+        if (!m_dela.is_infinite(e_i))
+            l.push_back(Delaunay::Simplex(e_i));
+    }
+    for (size_t i = 0; i < 4; i++) {
+        const Delaunay::Facet f_i = Delaunay::Facet(ch, i);
+        if (!m_dela.is_infinite(f_i))
+            l.push_back(Delaunay::Simplex(f_i));
+    }
+    if (!m_dela.is_infinite(ch))
+        l.push_back(Delaunay::Simplex(ch));
+    return l;
+}
+//******************************************************************************
 
 inline double max3(double d1, double d2, double d3)
 {
