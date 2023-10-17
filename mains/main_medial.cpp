@@ -4,6 +4,7 @@
 
 #include <fstream>
 #include <limits>
+#include <time.h>
 
 /* Input parser code found here:
  * https://stackoverflow.com/questions/865668/parsing-command-line-arguments-in-c */
@@ -66,10 +67,18 @@ int main(int argc, char* argv[])
 
     /* Now perform the method */
 
+    // evaluation variables
+    clock_t time_last = clock();
+    double time_delaunay = 0.0, time_filter = 0.0, time_persistence = 0.0;
+    int filter_size = 0; int number_of_holes = 0;
+
     std::vector<HoleMeas> holes;
     FiltrationMedial F(poly);
-    F.init_medial_info();
-    F.init_simplex_faces();
+    time_delaunay += (double)(clock() - time_last)/CLOCKS_PER_SEC;
+
+    time_last = clock();
+    F.init_finite_filtration_info();
+    F.init_infinite_filtration_info();
 
     if (medial_filtration_type == 0)
     {
@@ -78,23 +87,35 @@ int main(int argc, char* argv[])
         std::clog << "- Outer Filtration:" << std::endl;
         if (add_critical){F.add_critical_to_filter(MedialType::Outer);}
         F.make_filter(MedialType::Outer);
+        time_filter += (double)(clock() - time_last)/CLOCKS_PER_SEC;
+        filter_size += (int)F.get_filter_size();
+
+        time_last = clock();
         F.compute_delaunay_coboundary();
         Persistence<FiltrationMedial::Simplex> pers_out(F);
         pers_out.run_persistence();
         pers_out.compute_holes_from_pairs(false);
         // don't add the first 0-hole because we don't want to pair it
+        time_persistence += (double)(clock() - time_last)/CLOCKS_PER_SEC;
 
         /* we perform the inner filtration after the outer one in order to add
          * the first 0-hole easily at the end of the computations:
          */
+
+        time_last = clock();
         std::clog << "- Inner Filtration:" << std::endl;
         if (add_critical){F.add_critical_to_filter(MedialType::Inner);}
         F.make_filter(MedialType::Inner);
+        time_filter += (double)(clock() - time_last)/CLOCKS_PER_SEC;
+        filter_size += (int)F.get_filter_size();
+
+        time_last = clock();
         F.compute_delaunay_coboundary();
         Persistence<FiltrationMedial::Simplex> pers_in(F);
         pers_in.run_persistence();
         pers_in.compute_holes_from_pairs(false);
         // don't add the first 0-hole because we don't want to pair it
+        time_persistence += (double)(clock() - time_last)/CLOCKS_PER_SEC;
 
         std::clog << "- Hole Deduction:" << std::endl;
         std::vector<HoleMeas> holes_in = pers_in.get_holes();
@@ -124,18 +145,43 @@ int main(int argc, char* argv[])
 
         if (add_critical){F.add_critical_to_filter(medial_type);std::clog << "Add critical elements to filter" << std::endl;}
         F.make_filter(medial_type);
+        time_filter += (double)(clock() - time_last)/CLOCKS_PER_SEC;
+        filter_size += (int)F.get_filter_size();
+
+        time_last = clock();
         F.compute_delaunay_coboundary();
         Persistence<FiltrationMedial::Simplex> pers(F);
         pers.run_persistence();
         pers.compute_holes_from_pairs();
+        time_persistence += (double)(clock() - time_last)/CLOCKS_PER_SEC;
+
         holes = pers.get_holes();
     }
-    if (save_exhaustive_holes){
-        save_holes(holes, output_filename, "");
-    }
-    else {
-        save_present_holes(holes, output_filename, "");
-    }
+    // if (save_exhaustive_holes){
+    //     number_of_holes = save_holes(holes, output_filename, "");
+    // }
+    // else {
+    //     number_of_holes = save_present_holes(holes, output_filename, "");
+    // }
+
+    // std::cout << "## Medial : " << std::string(filename) << std::endl;
+    std::cout.precision(3);
+    // std::cout   //<< "del: " << std::fixed << time_delaunay    << "    "
+    //             << "fil: " << std::fixed << time_delaunay+time_filter  << "    "
+    //             << "per: " << std::fixed << time_persistence << "    "
+    //             << "bis: " << std::fixed << time_filter_bis  << "    " << std::endl;
+    // std::cout   << "tot: " << std::fixed << time_delaunay+time_filter+time_persistence << std::endl;
+    //
+    // std::cout   << "sampling size: " << poly.size_of_vertices() << std::endl;
+    // std::cout   << "filter size  : " << filter_size << std::endl;
+    // //std::cout   << "holes size   : " << number_of_holes << std::endl;
+    // std::cout   << std::endl;
+
+    std::cout   << std::string(filename) << " "
+                << poly.size_of_vertices() << " "
+                << filter_size << " "
+                << std::fixed << time_delaunay+time_filter << " "
+                << std::fixed << time_persistence << " ";
 
     return 0;
 }

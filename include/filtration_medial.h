@@ -60,8 +60,8 @@ public:
     FiltrationMedial(Polyhedron poly);//const std::string &filename);
     std::array<int,3> get_medial_count();
 
-    void init_medial_info();
-    void init_simplex_faces();
+    void init_finite_filtration_info();
+    void init_infinite_filtration_info();
     void make_filter(MedialType med_type);
     void add_critical_to_filter(MedialType med_type);
     void compute_delaunay_coboundary();
@@ -82,7 +82,7 @@ private:
     std::map<Simplex, MedialInfo> medial_info; /// map simplex -> medial information
 
     std::map<Simplex, std::pair<Simplices, Simplices>> simplex_faces; // Dfaces and Dcofaces
-    std::map<Delaunay::Simplex, Simplex> simplex_convert;
+    std::map<Delaunay::Simplex, Simplex> finite_simplex_convert;
     std::vector<int> medialtype_count;
     // std::map doesn't work with cell_handle / vertex_handle... that's a pity...
 };

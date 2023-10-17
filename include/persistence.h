@@ -58,14 +58,13 @@ void tb_pairing(
     const std::vector<HoleMeas>& t_holes,
     const std::vector<HoleMeas>& b_holes,
     std::vector<HoleMeas>& output);
-void save_holes_criteria(std::vector<HoleMeas> holes, std::string filename,
+int save_holes_criteria(std::vector<HoleMeas> holes, std::string filename,
     bool (*criteria)(double,double),
     std::string extension = ".tb");
-void save_holes(std::vector<HoleMeas> holes, std::string filename,
+int save_holes(std::vector<HoleMeas> holes, std::string filename,
     std::string extension = ".tb");
-void save_present_holes(std::vector<HoleMeas> holes, std::string filename,
+int save_present_holes(std::vector<HoleMeas> holes, std::string filename,
     std::string extension = ".tb");
-//void save_tb_pairs_bis(std::string filename ,std::string extension = "_V_bis.tb");
 
 /*############################################################################*/
 /*############################# Persistence class ############################*/

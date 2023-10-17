@@ -4,7 +4,7 @@
 
 #include <fstream>
 #include <limits>
-
+#include <time.h>
 
 
 int main(int argc, char* argv[])
@@ -51,22 +51,53 @@ int main(int argc, char* argv[])
 
     /* Now perform the method */
 
+    // evaluation variables
+    clock_t time_last = clock();
+    double time_delaunay = 0.0, time_filter = 0.0, time_persistence = 0.0;
+    int filter_size = 0; //int hole_size = 0;
 
+    std::vector<HoleMeas> holes;
     FiltrationVoronoi F(poly);
+    time_delaunay += (double)(clock() - time_last)/CLOCKS_PER_SEC;
+
+    time_last = clock();
     F.init_Dcell_filtration_values();
     F.compute_infinite_voronoi_face_duals();
     F.make_filter();
+    time_filter += (double)(clock() - time_last)/CLOCKS_PER_SEC;
+    filter_size += (int)F.get_filter_size();
+
+    time_last = clock();
     F.compute_delaunay_coboundary();
 
     Persistence<FiltrationVoronoi::Simplex> pers(F);
     pers.run_persistence();
     pers.compute_holes_from_pairs();
-    if (save_exhaustive_holes){
-        save_holes(pers.get_holes(), output_filename, "");
-    }
-    else {
-        save_present_holes(pers.get_holes(), output_filename, "");
-    }
+    time_persistence += (double)(clock() - time_last)/CLOCKS_PER_SEC;
+
+    holes = pers.get_holes();
+    // if (save_exhaustive_holes){
+    //     hole_size = save_holes(holes, output_filename, "");
+    // }
+    // else {
+    //     hole_size = save_present_holes(holes, output_filename, "");
+    // }
+
+    //std::cout << "## Voronoi: " << std::string(filename) << std::endl;
+    std::cout.precision(3);
+    // std::cout   //<< "del: " << std::fixed << time_delaunay    << "    "
+    //             << "fil: " << std::fixed << time_delaunay+time_filter      << "    "
+    //             << "per: " << std::fixed << time_persistence << "    " << std::endl;
+    // std::cout   << "tot: " << std::fixed << time_delaunay+time_filter+time_persistence << std::endl;
+    //
+    // std::cout   << "sampling size: " << poly.size_of_vertices() << std::endl;
+    // std::cout   << "filter size  : " << filter_size << std::endl;
+    // //std::cout   << "holes size   : " << hole_size << std::endl;
+    // std::cout   << std::endl;
+
+    std::cout   << filter_size << " "
+                << std::fixed << time_delaunay+time_filter << " "
+                << std::fixed << time_persistence << std::endl;
 
     return 0;
 }

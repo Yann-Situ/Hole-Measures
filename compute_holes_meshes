@@ -3,9 +3,9 @@
 # each file.off create a file.medial.tb and a file.voronoi.tb file
 usage()
 {
-    echo 'Usage: compute_holes_meshes "argument(s)" [-o dir] [-rm]'
+    echo 'Usage: compute_holes_meshes "argument(s)" [-o dir]'
     echo ""
-    echo "Compute exhaustive holes of input .off meshes using medial and Voronoi filtration."
+    echo "Compute present holes of input .off meshes using medial and Voronoi filtration."
     echo "Each file.off create a file.medial.tb and a file.voronoi.tb file"
     echo ""
     echo "-o dir : to move the computed files in the dir directory"
@@ -23,7 +23,8 @@ let "a=0"
 let "move=0"
 declare -a newfiles
 declare -a firstfiles
-
+evaluation_file="evaluation_optim.txt"
+touch $evaluation_file
 
 while [ "$1" != "" ]; do
     PARAM=`echo $1 | awk -F= '{print $1}'`
@@ -48,11 +49,12 @@ while [ "$1" != "" ]; do
 	    then
 		if [ -e "$1" ]
 		then
-            ./build/main_medial "$1" --exhaustive -o "${split[0]}.medial.tb"
+            #echo "# ${split[0]}" >> $evaluation_file
+            ./build/main_medial "$1" -o "${split[0]}.medial.tb" >> $evaluation_file
             echo -e "\e[92m$1 \e[39m processed using medial axes filtration."
-            ./build/main_voronoi "$1" --exhaustive -o "${split[0]}.voronoi.tb"
+            ./build/main_voronoi "$1" -o "${split[0]}.voronoi.tb" >> $evaluation_file
             echo -e "\e[92m$1 \e[39m processed using Voronoi filtration."
-		    let "a=a+1"
+		    let "a=a+2"
 		    firstfiles+=("$1")
 		    newfiles+=("${split[0]}.medial.tb")
 		    newfiles+=("${split[0]}.voronoi.tb")

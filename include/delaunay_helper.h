@@ -34,6 +34,9 @@ public:
 	static std::list<Delaunay::Simplex> D_faces(const Delaunay::Simplex s);
     static std::list<Delaunay::Simplex> D_sub_faces(const Delaunay::Cell_handle ch);
     static std::list<Delaunay::Simplex> D_sub_faces(const Delaunay::Facet f);
+    static std::list<Delaunay::Simplex> D_finite_faces(const Delaunay &m_dela, const Delaunay::Cell_handle ch);
+    static std::list<Delaunay::Simplex> D_finite_sub_faces(const Delaunay &m_dela, const Delaunay::Cell_handle ch);
+
     static double max_edge_sq(const Delaunay &m_dela, const Delaunay::Facet f);
     static bool is_infinite(
         const Delaunay &m_dela,

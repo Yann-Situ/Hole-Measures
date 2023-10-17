@@ -102,10 +102,10 @@ void tb_pairing(
 /**
  * @brief Persistence<Simplex>::save_holes_criteria
  * Save the hole measures in a file filename+extension that verifies
- * criteria(T.r, B.r).
+ * criteria(T.r, B.r). Return the number of such holes.
  * @Precondition : holes should have been computed.
  */
-void save_holes_criteria(std::vector<HoleMeas> holes, std::string filename,
+int save_holes_criteria(std::vector<HoleMeas> holes, std::string filename,
     bool (*criteria)(double,double), std::string extension)
 {
     // extract the TB balls
@@ -116,16 +116,20 @@ void save_holes_criteria(std::vector<HoleMeas> holes, std::string filename,
         << "impossible to create the output text file." << std::endl;
         exit(EXIT_FAILURE);
     }
+    int n = 0;
     for(HoleMeas hole : holes)
     {
         if (criteria(hole.T.r, hole.B.r))
+        {
             file << hole << std::endl;
+            n += 1;
+        }
     }
     file.close();
-    std::cout << "hole measures saved in "<< filename + extension
-    << ", recall that each line contains: " << std::endl
-    << "dimension t_radius t_center[3] b_radius b_center[3]" << std::endl;
-
+    std::clog << "hole measures saved in "<< filename + extension
+              << ", recall that each line contains: " << std::endl
+              << "dimension t_radius t_center[3] b_radius b_center[3]" << std::endl;
+    return n;
 }
 
 //bool valid_hole(double t, double b){return t > -b;};
@@ -134,13 +138,14 @@ void save_holes_criteria(std::vector<HoleMeas> holes, std::string filename,
 /**
  * @brief Persistence<Simplex>::save_holes
  * Save the every hole measures in a file filename+extension.
+ * Return the number of such holes.
  * @Precondition : holes should have been computed.
  */
-void save_holes(std::vector<HoleMeas> holes, std::string filename,
+int save_holes(std::vector<HoleMeas> holes, std::string filename,
     std::string extension)
 {
-    std::cout << "exhaustive ";
-    save_holes_criteria(holes, filename,
+    std::clog << "exhaustive ";
+    return save_holes_criteria(holes, filename,
         [](double t, double b) -> bool {return t > -b;},
         extension);
 }
@@ -148,14 +153,14 @@ void save_holes(std::vector<HoleMeas> holes, std::string filename,
 /**
  * @brief Persistence<Simplex>::save_tb_balls
  * Save the tb ball pairs that have negative birth date and positive death rate
- * in a file filename+extension.
+ * in a file filename+extension. Return the number of such holes.
  * @Precondition : holes should have been computed.
  */
-void save_present_holes(std::vector<HoleMeas> holes, std::string filename,
+int save_present_holes(std::vector<HoleMeas> holes, std::string filename,
     std::string extension)
 {
-    std::cout << "present ";
-    save_holes_criteria(holes, filename,
+    std::clog << "present ";
+    return save_holes_criteria(holes, filename,
         [](double t, double b) -> bool {return t > 0 && b > 0;},
         extension);
 }

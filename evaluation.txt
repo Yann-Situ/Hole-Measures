@@ -1,0 +1,258 @@
+# data/ballcube
+## Medial : data/ballcube.off
+del: 1.377676    fil: 7.930808    per: 1.562273    bis: 5.101989    
+tot: 10.870757
+sampling size: 5434
+filter size  : 123478
+holes size   : 6
+
+## Voronoi: data/ballcube.off
+del: 1.372232    fil: 4.409220    per: 3.239111    
+tot: 9.020563
+sampling size: 5434
+filter size  : 126513
+holes size   : 6
+
+# data/body-bottom
+## Medial : data/body-bottom.off
+del: 1.166172    fil: 13.472051    per: 2.150439    bis: 8.296747    
+tot: 16.788662
+sampling size: 6074
+filter size  : 131351
+holes size   : 8
+
+## Voronoi: data/body-bottom.off
+del: 1.147950    fil: 5.434570    per: 4.154605    
+tot: 10.737125
+sampling size: 6074
+filter size  : 160985
+holes size   : 12
+
+# data/chairs
+# data/cylinder-slots
+## Medial : data/cylinder-slots.off
+del: 2.663847    fil: 15.462072    per: 2.284172    bis: 11.163438    
+tot: 20.410091
+sampling size: 6904
+filter size  : 177862
+holes size   : 16
+
+## Voronoi: data/cylinder-slots.off
+del: 1.631943    fil: 6.708739    per: 5.308859    
+tot: 13.649541
+sampling size: 6904
+filter size  : 199853
+holes size   : 16
+
+# data/egg-box
+## Medial : data/egg-box.off
+del: 0.340959    fil: 2.180970    per: 0.751071    bis: 1.467248    
+tot: 3.273000
+sampling size: 1727
+filter size  : 32688
+holes size   : 3
+
+## Voronoi: data/egg-box.off
+del: 0.334954    fil: 1.201642    per: 1.037994    
+tot: 2.574590
+sampling size: 1727
+filter size  : 32011
+holes size   : 3
+
+# data/eight
+## Medial : data/eight.off
+del: 0.053338    fil: 0.473520    per: 0.294547    bis: 0.306092    
+tot: 0.821405
+sampling size: 315
+filter size  : 7992
+holes size   : 3
+
+## Voronoi: data/eight.off
+del: 0.055595    fil: 0.309488    per: 0.444474    
+tot: 0.809557
+sampling size: 315
+filter size  : 8699
+holes size   : 3
+
+# data/fourcomponents
+## Medial : data/fourcomponents.off
+del: 3.568699    fil: 15.988366    per: 2.504867    bis: 10.024828    
+tot: 22.061932
+sampling size: 6536
+filter size  : 148132
+holes size   : 7
+
+## Voronoi: data/fourcomponents.off
+del: 2.619098    fil: 6.429252    per: 7.113645    
+tot: 16.161995
+sampling size: 6536
+filter size  : 181405
+holes size   : 7
+
+# data/Gear
+## Medial : data/Gear.off
+del: 3.299422    fil: 21.058949    per: 3.503219    bis: 13.976462    
+tot: 27.861590
+sampling size: 11182
+filter size  : 268188
+holes size   : 13
+
+## Voronoi: data/Gear.off
+del: 3.357394    fil: 17.368487    per: 14.332125    
+tot: 35.058006
+sampling size: 11182
+filter size  : 321825
+holes size   : 13
+
+# data/Handle
+## Medial : data/Handle.off
+del: 0.733214    fil: 6.540352    per: 1.220791    bis: 4.725260    
+tot: 8.494357
+sampling size: 3070
+filter size  : 78498
+holes size   : 33
+
+## Voronoi: data/Handle.off
+del: 0.664905    fil: 3.754208    per: 2.080972    
+tot: 6.500085
+sampling size: 3070
+filter size  : 79233
+holes size   : 47
+
+# data/hexa-screw
+## Medial : data/hexa-screw.off
+del: 0.380764    fil: 2.652322    per: 0.913540    bis: 1.731056    
+tot: 3.946626
+sampling size: 2035
+filter size  : 42566
+holes size   : 6
+
+## Voronoi: data/hexa-screw.off
+del: 0.402711    fil: 1.471815    per: 1.317465    
+tot: 3.191991
+sampling size: 2035
+filter size  : 48595
+holes size   : 6
+
+# data/klein-bottle
+# data/knot
+## Medial : data/knot.off
+del: 0.600676    fil: 5.185075    per: 1.136794    bis: 3.454905    
+tot: 6.922545
+sampling size: 3200
+filter size  : 77700
+holes size   : 2
+
+## Voronoi: data/knot.off
+del: 0.591593    fil: 2.836447    per: 2.305985    
+tot: 5.734025
+sampling size: 3200
+filter size  : 91325
+holes size   : 2
+
+# data/pawns
+## Medial : data/pawns.off
+del: 0.753649    fil: 3.702724    per: 0.938296    bis: 2.449507    
+tot: 5.394669
+sampling size: 2728
+filter size  : 58040
+holes size   : 2
+
+## Voronoi: data/pawns.off
+del: 0.757246    fil: 2.196108    per: 1.703095    
+tot: 4.656449
+sampling size: 2728
+filter size  : 62485
+holes size   : 2
+
+# data/rhombic-dodecahedron
+## Medial : data/rhombic-dodecahedron.off
+del: 0.914223    fil: 5.231160    per: 1.147261    bis: 3.342994    
+tot: 7.292644
+sampling size: 3781
+filter size  : 82066
+holes size   : 12
+
+## Voronoi: data/rhombic-dodecahedron.off
+del: 0.685482    fil: 2.878980    per: 2.718106    
+tot: 6.282568
+sampling size: 3781
+filter size  : 98907
+holes size   : 12
+
+# data/smooth-body-bottom
+# data/triakis-tetrahedron-bad
+## Medial : data/triakis-tetrahedron-bad.off
+del: 0.621470    fil: 5.269689    per: 1.133637    bis: 3.597586    
+tot: 7.024796
+sampling size: 2852
+filter size  : 65206
+holes size   : 12
+
+## Voronoi: data/triakis-tetrahedron-bad.off
+del: 0.580631    fil: 2.724769    per: 2.345950    
+tot: 5.651350
+sampling size: 2852
+filter size  : 79209
+holes size   : 36
+
+# data/triakis-tetrahedron
+## Medial : data/triakis-tetrahedron.off
+del: 0.722807    fil: 5.722744    per: 1.196632    bis: 3.762781    
+tot: 7.642183
+sampling size: 3745
+filter size  : 84174
+holes size   : 12
+
+## Voronoi: data/triakis-tetrahedron.off
+del: 0.701493    fil: 2.943830    per: 2.630950    
+tot: 6.276273
+sampling size: 3745
+filter size  : 100751
+holes size   : 12
+
+# data/twirl
+## Medial : data/twirl.off
+del: 1.229435    fil: 9.476466    per: 1.898914    bis: 6.011514    
+tot: 12.604815
+sampling size: 5989
+filter size  : 143688
+holes size   : 7
+
+## Voronoi: data/twirl.off
+del: 1.176854    fil: 5.260315    per: 5.090517    
+tot: 11.527686
+sampling size: 5989
+filter size  : 177823
+holes size   : 31
+
+# data/two-cubes
+## Medial : data/two-cubes.off
+del: 0.069785    fil: 0.323870    per: 0.146890    bis: 0.222508    
+tot: 0.540545
+sampling size: 196
+filter size  : 3214
+holes size   : 2
+
+## Voronoi: data/two-cubes.off
+del: 0.042363    fil: 0.128636    per: 0.238698    
+tot: 0.409697
+sampling size: 196
+filter size  : 2541
+holes size   : 2
+
+# data/two-rings
+## Medial : data/two-rings.off
+del: 0.248659    fil: 1.343602    per: 0.617605    bis: 0.835409    
+tot: 2.209866
+sampling size: 1000
+filter size  : 24654
+holes size   : 4
+
+## Voronoi: data/two-rings.off
+del: 0.302545    fil: 0.689814    per: 0.806336    
+tot: 1.798695
+sampling size: 1000
+filter size  : 26473
+holes size   : 4
+
