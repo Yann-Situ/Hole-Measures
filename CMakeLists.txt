@@ -1,7 +1,7 @@
 # Created by the script cgal_create_CMakeLists
 # This is the CMake script for compiling a set of CGAL applications.
 
-project(tb-mesh)
+project(Hole-Measures)
 
 cmake_minimum_required(VERSION 2.8.10)
 
@@ -37,7 +37,7 @@ endif()
 # CGAL and its components
 find_package( CGAL QUIET COMPONENTS Qt5 )
 if ( NOT CGAL_FOUND )
-  message(STATUS "This project requires the CGAL library, and will not be compiled.")
+  message(STATUS "This project requires the CGAL library. CGAL was not found so the project will not be compiled.")
   return()
 endif()
 
@@ -45,7 +45,7 @@ endif()
 # Boost and its components
 find_package( Boost REQUIRED )
 if ( NOT Boost_FOUND )
-  message(STATUS "This project requires the Boost library, and will not be compiled.")
+  message(STATUS "This project requires the Boost library. Boost was not found so the project will not be compiled.")
   return()
 endif()
 
@@ -55,7 +55,7 @@ if(CGAL_Qt5_FOUND)
   #required to use basic_viewer
   add_definitions(-DCGAL_USE_BASIC_VIEWER -DQT_NO_KEYWORDS)
 else()
-  message(STATUS "This project requires the CGAL_Qt5.")
+  message(STATUS "This project requires the CGAL_Qt5. CGAL_Qt5 was not found so the project will not be compiled.")
   return()
 endif()
 
@@ -84,27 +84,20 @@ include_directories( BEFORE ../include )
 
 # Creating entries for all C++ files with "main" routine
 # ##########################################################
-set(main_voronoi "main_voronoi")
+set(main_link "main_link")
 set(main_medial "main_medial")
-set(main_resampling "main_resampling")
-set(main_medial_count "main_medial_count")
-add_executable(main_voronoi "mains/main_voronoi.cpp")
+#set(main_resampling "main_resampling") # WIP
+add_executable(main_link "mains/main_link.cpp")
 add_executable(main_medial "mains/main_medial.cpp")
-add_executable(main_resampling "mains/main_resampling.cpp")
-add_executable(main_medial_count "mains/main_medial_count.cpp")
+#add_executable(main_resampling "mains/main_resampling.cpp") # WIP
 
 # [1]
 if(CGAL_Qt5_FOUND)
-    # target_link_libraries(main PUBLIC CGAL::CGAL_Qt5)
-    # target_link_libraries(main_resampling PUBLIC CGAL::CGAL_Qt5)
-    #target_link_libraries(main ${CGAL_LIBRARIES} ${CGAL_3RD_PARTY_LIBRARIES})
-    target_link_libraries(main_voronoi CGAL::CGAL CGAL::CGAL_Qt5)
+    target_link_libraries(main_link CGAL::CGAL CGAL::CGAL_Qt5)
     target_link_libraries(main_medial CGAL::CGAL CGAL::CGAL_Qt5)
-    target_link_libraries(main_resampling CGAL::CGAL CGAL::CGAL_Qt5)
-    target_link_libraries(main_medial_count CGAL::CGAL CGAL::CGAL_Qt5)
+    #target_link_libraries(main_resampling CGAL::CGAL CGAL::CGAL_Qt5) # WIP
 
-    target_link_libraries(main_voronoi BaseFiles)
+    target_link_libraries(main_link BaseFiles)
     target_link_libraries(main_medial BaseFiles)
-    target_link_libraries(main_resampling BaseFiles)
-    target_link_libraries(main_medial_count BaseFiles)
+    #target_link_libraries(main_resampling BaseFiles) # WIP
 endif()

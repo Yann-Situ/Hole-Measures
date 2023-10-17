@@ -1,3 +1,8 @@
+////////////////////////////////////////////////////////////////////////////////
+/* This is a work in progress. We aim to find an algorithm that produce an
+ * appropriate sampling on the mesh (ideally an epsilon sampling) that provides
+ * guarantees on the topology of the medial axis approximation. */
+////////////////////////////////////////////////////////////////////////////////
 #include "resampling.h"
 #include "delaunay_helper.h"
 #include <iostream>
