@@ -1,5 +1,5 @@
 # Hole-Measures
-Software for computing the hole measures (thickness and breadth-balls) of topological holes from a 3D volumetric object represented by polygonal mesh of its surface. The theoretical work linked with this repository has been published in a special issue of _Computer Aided Design_: [Computing Geometrical Measures of Topological Holes](https://doi.org/10.1016/j.cad.2023.103563).
+Software for computing the hole measures (thickness and breadth-balls) of topological holes from a 3D volumetric object represented by polygonal mesh of its surface. The theoretical work linked with this repository has been published in a special issue of _Computer Aided Design_: [Computing Geometrical Measures of Topological Holes](https://doi.org/10.1016/j.cad.2023.103563) ([HAL version](https://hal.science/hal-04322031v1)).
 ![graphical-abstract](https://github.com/Yann-Situ/Hole-Measures/assets/51318484/8060e38f-420c-435c-89f3-f8a7bcf37fda)
 
 -----------------
