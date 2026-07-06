@@ -2,4 +2,6 @@ build
 tools/build-*
 tools/gui/*.user
 tools/gui/OpenMesh/
-data/*
+data/results/
+data/off/
+*/.DS_Store
