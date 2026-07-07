@@ -245,6 +245,28 @@ def parse_arguments():
     )
     return parser.parse_args()
 
+# Actors pyvista
+def add_labeled_checkbox(plotter, label, callback, value, x, y):
+    plotter.add_checkbox_button_widget(
+        callback,
+        value=value,
+        position=(x, y),
+        size=25,
+    )
+
+    plotter.add_text(
+        label,
+        position=(x + 35, y + 5),
+        font_size=10,
+    )
+    
+show_thickness = True
+show_breadth = True
+show_only_present = True
+show_dim0 = True
+show_dim1 = True
+show_dim2 = True
+
 current_pair = 0
 filter_value = 0.0
 filter_increment = 0.02
@@ -277,10 +299,6 @@ def main():
     Space : lock pair
     A      : show all pairs
     H      : hide all pairs
-    P      : show all present pairs
-    T      : show all T-balls
-    B      : show all B-balls
-    0/1/2  : show all pairs of specific dimension
     """
     plotter.add_text(help_text, position="upper_left",font_size=8)
     
@@ -289,81 +307,83 @@ def main():
         plotter.remove_actor(text_actor)
         text_actor = plotter.add_text(s, position="upper_right", font_size=10)
     
+    # Controls
+    
+    def toggle_thickness(state):
+        global show_thickness
+        show_thickness = state
+        update_visibles()
+    def toggle_breadth(state):
+        global show_breadth
+        show_breadth = state
+        update_visibles()
+    def toggle_dim0(state):
+        global show_dim0
+        show_dim0 = state
+        update_visibles()
+    def toggle_dim1(state):
+        global show_dim1
+        show_dim1 = state
+        update_visibles()
+    def toggle_dim2(state):
+        global show_dim2
+        show_dim2 = state
+        update_visibles()
+    def toggle_only_present(state):
+        global show_only_present
+        show_only_present = state
+        update_visibles()
+    
+    controls = [
+        ("thickness-balls", toggle_thickness),
+        ("breadth-balls", toggle_breadth),
+        ("dim0", toggle_dim0),
+        ("dim1", toggle_dim1),
+        ("dim2", toggle_dim2),
+        ("show only present holes", toggle_only_present)
+    ]
+
+    for i, (label, callback) in enumerate(controls):
+        y = 10 + i * 35
+        add_labeled_checkbox(plotter, label, callback, True, 10, y)
+        
+    def update_visibles():
+        count = 0
+        for k, (t_actor, b_actor) in enumerate(actors):
+            visible = locked[k] or \
+                ((show_dim0 and pairs[k].dim==0) or (show_dim1 and pairs[k].dim==1) or (show_dim2 and pairs[k].dim==2)) and \
+                (not show_only_present or pairs[k].present) and \
+                (pairs[k].pers >= filter_value)
+            if visible:
+                count += 1
+            if t_actor is not None:
+                t_actor.SetVisibility(visible and show_thickness)
+            if b_actor is not None:
+                b_actor.SetVisibility(visible and show_breadth)
+        plotter.remove_actor(text_actor)
+        update_text("show "+str(count)+" pairs (filtered)")
+        plotter.render()
+    
     # Keyboard Shortcuts
     
     def hide_all():
-        for t_actor, b_actor in actors:
+        count = 0
+        for k, (t_actor, b_actor) in enumerate(actors):
+            visible = False
+            if visible:
+                count += 1
             if t_actor is not None:
-                t_actor.SetVisibility(False)
-
+                t_actor.SetVisibility(visible)
             if b_actor is not None:
-                b_actor.SetVisibility(False)
+                b_actor.SetVisibility(visible)
+        plotter.remove_actor(text_actor)
         update_text("hide all pairs")
         plotter.render()
         
     def show_all():
         count = 0
         for k, (t_actor, b_actor) in enumerate(actors):
-            visible = (pairs[k].pers >= filter_value) or locked[k]
-            if visible:
-                count += 1
-            if t_actor is not None:
-                t_actor.SetVisibility(visible)
-
-            if b_actor is not None:
-                b_actor.SetVisibility(visible)
-        update_text("show all pairs (filtered)\n"+str(count)+" TB-pairs")
-        plotter.render()
-        
-    def show_all_present():
-        count = 0
-        for k, (t_actor, b_actor) in enumerate(actors):
-            visible = (pairs[k].present and pairs[k].pers >= filter_value) or locked[k]
-            if visible:
-                count += 1
-            if t_actor is not None:
-                t_actor.SetVisibility(visible)
-
-            if b_actor is not None:
-                b_actor.SetVisibility(visible)
-        plotter.remove_actor(text_actor)
-        update_text("show all present pairs (filtered)\n"+str(count)+" TB-pairs")
-        plotter.render()
-        
-    def show_all_thickness():
-        count = 0
-        for k, (t_actor, b_actor) in enumerate(actors):
-            visible = (pairs[k].pers >= filter_value) or locked[k]
-            if visible:
-                count += 1
-            if t_actor is not None:
-                t_actor.SetVisibility(visible)
-
-            if b_actor is not None:
-                b_actor.SetVisibility(False)
-        plotter.remove_actor(text_actor)
-        update_text("show all thickness balls (filtered)\n"+str(count)+" T-balls")
-        plotter.render()
-        
-    def show_all_breadth():
-        count = 0
-        for k, (t_actor, b_actor) in enumerate(actors):
-            visible = (pairs[k].pers >= filter_value) or locked[k]
-            if visible:
-                count += 1
-            if t_actor is not None:
-                t_actor.SetVisibility(False)
-
-            if b_actor is not None:
-                b_actor.SetVisibility(visible)
-        plotter.remove_actor(text_actor)
-        update_text("show all breadth balls (filtered)\n"+str(count)+" B-balls")
-        plotter.render()
-        
-    def show_dim(d):
-        count = 0
-        for k, (t_actor, b_actor) in enumerate(actors):
-            visible = (pairs[k].pers >= filter_value and pairs[k].dim == d) or locked[k]
+            visible = (pairs[k].pers >= filter_value)
             if visible:
                 count += 1
             if t_actor is not None:
@@ -371,14 +391,8 @@ def main():
             if b_actor is not None:
                 b_actor.SetVisibility(visible)
         plotter.remove_actor(text_actor)
-        update_text("show pairs of dimension "+str(d)+" (filtered)\n"+str(count)+" TB-pairs")
+        update_text("show "+str(count)+" pairs (filtered)")
         plotter.render()
-    def show_0():
-        show_dim(0)
-    def show_1():
-        show_dim(1)
-    def show_2():
-        show_dim(2)
 
     # selected pair
     locked = [False] * len(actors)
@@ -424,12 +438,18 @@ def main():
     def update_filter(value):
         global filter_value
         filter_value = value
-        show_all()
+        update_visibles()
         plotter.render()
 
-    plotter.add_slider_widget(update_filter, rng=[0.0, 1.0], value=filter_value, title="Filter")
+    max_pers = 0.0
+    for pair in pairs:
+        if pair.pers < np.inf and pair.pers > -np.inf:
+            max_pers = max(abs(pair.pers), max_pers)
+    print(max_pers)
+    plotter.add_slider_widget(update_filter, rng=[0.0, max_pers+0.05], value=filter_value, title="Filter")
     
-
+    update_visibles()
+    
     # Nice camera
     plotter.add_axes()
     plotter.show_grid()
@@ -437,12 +457,6 @@ def main():
 
     # Keyboard shortcuts:
     plotter.add_key_event("a", show_all)
-    plotter.add_key_event("p", show_all_present)
-    plotter.add_key_event("t", show_all_thickness)
-    plotter.add_key_event("b", show_all_breadth)
-    plotter.add_key_event("0", show_0)
-    plotter.add_key_event("1", show_1)
-    plotter.add_key_event("2", show_2)
     plotter.add_key_event("h", hide_all)
     plotter.add_key_event("Right", next_pair)
     plotter.add_key_event("Left", previous_pair)
