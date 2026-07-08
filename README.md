@@ -5,7 +5,7 @@ Software for computing the hole measures (thickness and breadth-balls) of topolo
 -----------------
 
 ## Requirement
-This project requires the [CGAL](https://www.cgal.org/) library with Boost and QT5 (on Linux distributions, `sudo apt-get install libcgal-dev libcgal-qt5-dev` should do the job).
+This project requires the [CGAL](https://www.cgal.org/) (on Linux distributions, `sudo apt-get install libcgal-dev libcgal-qt5-dev` should do the job).
 The library [PHAT](https://github.com/blazs/phat) is already in the repository (`include/phat/`). The project also requires [Cmake](https://cmake.org/download/) with version above 2.8.10.
 
 ## Usage
@@ -60,5 +60,20 @@ Note that there is always a thickness-ball of dimension 0 that has no correspond
 ```
 
 ## Visualization
-To visualize the result, the user can open the _.tb_ file and its associated _.off_ file in the GUI `tools/gui/hole-measures-gui.pro`.
-`tools/gui/hole-measures-gui.pro` can compiled using `qtcreator`.
+To visualize the result, user can use the dedicated python script `hole-ball-viewer.py` with the corresponding *.off* and *.tb* files.
+Note that this script requires [pyvista](https://pyvista.org/), which can be installed with command `pip install 'pyvista[all]'`.
+
+For instance run the following command line:
+```
+python3 hole-ball-viewer.py data/example/eight.off data/example/eight.exhaustive.tb
+```
+You should obtain the following window:
+<img width="937" height="515" alt="Screenshot-pyvista-hole-ball-viewer" src="https://github.com/user-attachments/assets/6c2d354f-b650-4bad-a984-a403da981cf1" />
+
+The *Filter* slider allows to discard *TB*-pairs that have a low persistence value (i.e. noise).
+
+It is also possible to visualize the corresponding persistence diagram with the argument `--diagram`.
+For example, the following line display the (present) *TB*-pairs and the 3D model *eight.off*, as well as the corresponding persistence diagram.
+```
+python3 hole-ball-viewer.py data/example/eight.off data/example/eight.tb --diagram
+```

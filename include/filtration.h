@@ -3,6 +3,8 @@
 
 
 #include "cgal_typedef.h"
+
+
 /**
  * @brief The Filtration class
  * Abstract class for persistence
