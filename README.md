@@ -65,15 +65,15 @@ Note that this script requires [pyvista](https://pyvista.org/), which can be ins
 
 For instance run the following command line:
 ```
-python3 hole-ball-viewer.py data/example/eight.off data/example/eight.tb
+python3 hole-ball-viewer.py data/example/eight.off data/example/eight.exhaustive.tb
 ```
-You should obtain the following figure:
-<img width="804" height="636" alt="Capture d’écran du 2026-07-06 17-44-40" src="https://github.com/user-attachments/assets/fbd0cf96-3e6e-4365-b307-3eb50632fcf3" />
+You should obtain the following window:
+<img width="937" height="515" alt="Screenshot-pyvista-hole-ball-viewer" src="https://github.com/user-attachments/assets/6c2d354f-b650-4bad-a984-a403da981cf1" />
 
 The *Filter* slider allows to discard *TB*-pairs that have a low persistence value (i.e. noise).
 
 It is also possible to visualize the corresponding persistence diagram with the argument `--diagram`.
-For example, the following line display the exhaustive *TB*-pairs and the 3D model *eight.off*, as well as the corresponding persistence diagram.
+For example, the following line display the (present) *TB*-pairs and the 3D model *eight.off*, as well as the corresponding persistence diagram.
 ```
-python3 hole-ball-viewer.py data/example/eight.off data/example/eight.exhaustive.tb --diagram
+python3 hole-ball-viewer.py data/example/eight.off data/example/eight.tb --diagram
 ```
