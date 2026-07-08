@@ -262,10 +262,11 @@ def add_labeled_checkbox(plotter, label, callback, value, x, y):
     
 show_thickness = True
 show_breadth = True
-show_only_present = True
 show_dim0 = True
 show_dim1 = True
 show_dim2 = True
+show_present = True
+show_non_present = False
 
 current_pair = 0
 filter_value = 0.0
@@ -296,9 +297,9 @@ def main():
     # Help text
     help_text = """
     left/right : previous/next pair
-    Space : lock pair
-    A      : show all pairs
-    H      : hide all pairs
+    Space      : lock pair
+    A          : show pairs
+    H          : hide all pairs
     """
     plotter.add_text(help_text, position="upper_left",font_size=8)
     
@@ -308,7 +309,6 @@ def main():
         text_actor = plotter.add_text(s, position="upper_right", font_size=10)
     
     # Controls
-    
     def toggle_thickness(state):
         global show_thickness
         show_thickness = state
@@ -329,31 +329,38 @@ def main():
         global show_dim2
         show_dim2 = state
         update_visibles()
-    def toggle_only_present(state):
-        global show_only_present
-        show_only_present = state
+    def toggle_present(state):
+        global show_present
+        show_present = state
+        update_visibles()
+    def toggle_non_present(state):
+        global show_non_present
+        show_non_present = state
         update_visibles()
     
     controls = [
-        ("thickness-balls", toggle_thickness),
-        ("breadth-balls", toggle_breadth),
-        ("dim0", toggle_dim0),
-        ("dim1", toggle_dim1),
-        ("dim2", toggle_dim2),
-        ("show only present holes", toggle_only_present)
+        ("show non-present holes", toggle_non_present, show_non_present),
+        ("show present holes", toggle_present, show_present),
+        ("breadth-balls", toggle_breadth, show_breadth),
+        ("thickness-balls", toggle_thickness, show_thickness),
+        ("dim2", toggle_dim2, show_dim2),
+        ("dim1", toggle_dim1, show_dim1),
+        ("dim0", toggle_dim0, show_dim0),
     ]
 
-    for i, (label, callback) in enumerate(controls):
+    for i, (label, callback, bool) in enumerate(controls):
         y = 10 + i * 35
-        add_labeled_checkbox(plotter, label, callback, True, 10, y)
-        
+        add_labeled_checkbox(plotter, label, callback, bool, 10, y)
+    
+    def visibility_bool(k):
+        return  ((show_dim0 and pairs[k].dim==0) or (show_dim1 and pairs[k].dim==1) or (show_dim2 and pairs[k].dim==2)) and \
+                ((show_present and pairs[k].present) or (show_non_present and not pairs[k].present)) and \
+                (pairs[k].pers >= filter_value) # does not take into account lock
+    
     def update_visibles():
         count = 0
         for k, (t_actor, b_actor) in enumerate(actors):
-            visible = locked[k] or \
-                ((show_dim0 and pairs[k].dim==0) or (show_dim1 and pairs[k].dim==1) or (show_dim2 and pairs[k].dim==2)) and \
-                (not show_only_present or pairs[k].present) and \
-                (pairs[k].pers >= filter_value)
+            visible = locked[k] or visibility_bool(k)
             if visible:
                 count += 1
             if t_actor is not None:
@@ -364,8 +371,7 @@ def main():
         update_text("show "+str(count)+" pairs (filtered)")
         plotter.render()
     
-    # Keyboard Shortcuts
-    
+    # Keyboard Shortcuts functions
     def hide_all():
         count = 0
         for k, (t_actor, b_actor) in enumerate(actors):
@@ -379,31 +385,15 @@ def main():
         plotter.remove_actor(text_actor)
         update_text("hide all pairs")
         plotter.render()
-        
-    def show_all():
-        count = 0
-        for k, (t_actor, b_actor) in enumerate(actors):
-            visible = (pairs[k].pers >= filter_value)
-            if visible:
-                count += 1
-            if t_actor is not None:
-                t_actor.SetVisibility(visible)
-            if b_actor is not None:
-                b_actor.SetVisibility(visible)
-        plotter.remove_actor(text_actor)
-        update_text("show "+str(count)+" pairs (filtered)")
-        plotter.render()
 
-    # selected pair
     locked = [False] * len(actors)
     def show_pair(i):
         for k, (t_actor, b_actor) in enumerate(actors):
             visible = (k == i) or locked[k]
             if t_actor is not None:
-                t_actor.SetVisibility(visible)
-
+                t_actor.SetVisibility(visible and show_thickness)
             if b_actor is not None:
-                b_actor.SetVisibility(visible)
+                b_actor.SetVisibility(visible and show_breadth)
         update_text("pair "+str(i)+" out of "+str(len(actors))+
             "\npersistence : "+"%.3f" % pairs[i].pers+
             "\ndimension : "+str(pairs[i].dim))
@@ -412,17 +402,21 @@ def main():
     def next_pair():
         global current_pair
         old = current_pair
-        current_pair = (current_pair + 1) % len(actors)
-        while pairs[current_pair].pers < filter_value and current_pair != old:
-            current_pair = (current_pair + 1) % len(actors)
+        k = (current_pair + 1) % len(actors)
+        while k != old and not visibility_bool(k):
+            k = (k + 1) % len(actors)
+        current_pair = k
         show_pair(current_pair)
+        
     def previous_pair():
         global current_pair
         old = current_pair
-        current_pair = (current_pair - 1) % len(actors)
-        while pairs[current_pair].pers < filter_value and current_pair != old:
-            current_pair = (current_pair - 1) % len(actors)
+        k = (current_pair - 1) % len(actors)
+        while k != old and  not visibility_bool(k):
+            k = (k - 1) % len(actors)
+        current_pair = k
         show_pair(current_pair)
+        
     def lock_current_pair():
         global current_pair
         locked[current_pair] = not locked[current_pair]
@@ -433,6 +427,14 @@ def main():
         if b_actor is not None:
             b_actor.SetVisibility(visible)
         plotter.render()
+        
+    # adding Keyboard shortcuts:
+    plotter.add_key_event("a", update_visibles)
+    plotter.add_key_event("h", hide_all)
+    plotter.add_key_event("Right", next_pair)
+    plotter.add_key_event("Left", previous_pair)
+    plotter.add_key_event("space", lock_current_pair)
+
 
     # Filter
     def update_filter(value):
@@ -445,27 +447,21 @@ def main():
     for pair in pairs:
         if pair.pers < np.inf and pair.pers > -np.inf:
             max_pers = max(abs(pair.pers), max_pers)
-    print(max_pers)
-    plotter.add_slider_widget(update_filter, rng=[0.0, max_pers+0.05], value=filter_value, title="Filter")
-    
-    update_visibles()
+    plotter.add_slider_widget(update_filter, rng=[0.0, max_pers+0.02], value=filter_value, title="Filter")
     
     # Nice camera
-    plotter.add_axes()
-    plotter.show_grid()
+    # plotter.add_axes()
+    # plotter.show_grid()
     plotter.reset_camera()
-
-    # Keyboard shortcuts:
-    plotter.add_key_event("a", show_all)
-    plotter.add_key_event("h", hide_all)
-    plotter.add_key_event("Right", next_pair)
-    plotter.add_key_event("Left", previous_pair)
-    plotter.add_key_event("space", lock_current_pair)
+    
+    # initial update
+    update_visibles()
     
     # Optional scatter plot
     if args.diagram:
         plt.ion()
         plot_tb_scatter(pairs)
+        plt.ioff()
         
     # Launch interactive viewer
     plotter.show()
